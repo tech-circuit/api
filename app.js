@@ -1,10 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
+const cors = require('cors');
 require('dotenv').config();
 
 const indexRouter = require('./routes/index');
-const authRouter = require('./routes/auth');
+const userRouter = require('./routes/user');
 
 const db = process.env.MONGODB_URL;
 
@@ -28,8 +29,9 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors());
 
 app.use('/api', indexRouter);
-app.use('/auth', authRouter);
+app.use('/user', userRouter);
 
 module.exports = app;
