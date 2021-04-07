@@ -1,0 +1,26 @@
+{
+    "name": "techcircuit-api",
+    "version": "1.0.0",
+    "description": "REST API for TechCircuit.",
+    "main": "app.js",
+    "scripts": {
+        "dev": "nodemon app.js",
+        "start": "node app.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/tech-circuit/api.git"
+    },
+    "author": "Laxya Pahuja",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/tech-circuit/api/issues"
+    },
+    "homepage": "https://github.com/tech-circuit/api#readme",
+    "dependencies": {
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "mongoose": "^5.12.3",
+        "nodemon": "^2.0.7"
+    }
+}
