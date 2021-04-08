@@ -32,6 +32,10 @@ const UserSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
+    },
+    club: {
+        type: String,
+        required: false
     }
 })
 

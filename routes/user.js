@@ -4,9 +4,9 @@ const User = require('../models/User')
 
 router.post('/gauth', (req, res) => {
     try {
-        User.findOne({ email: req.body.email }).then((user) => {
+        User.findOne({ access_token: req.params.access_token }).then((user) => {
             if (!user) {
-                username = req.body.email.split('@')[0]
+                let username = req.body.email.split('@')[0]
                 let newUser = User({
                     email: req.body.email,
                     name: req.body.name,
@@ -23,6 +23,7 @@ router.post('/gauth', (req, res) => {
                 user.save()
             }
         })
+        res.sendStatus(200)
     } catch (err) {
         console.log(err)
     }
