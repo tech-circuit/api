@@ -34,7 +34,7 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
     club: {
-        type: String,
+        type: Object,
         required: false
     }
 })

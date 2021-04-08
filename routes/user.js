@@ -4,7 +4,7 @@ const User = require('../models/User')
 
 router.post('/gauth', (req, res) => {
     try {
-        User.findOne({ access_token: req.params.access_token }).then((user) => {
+        User.findOne({ google_id: req.body.googleId }).then((user) => {
             if (!user) {
                 let username = req.body.email.split('@')[0]
                 let newUser = User({
