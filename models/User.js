@@ -36,6 +36,14 @@ const UserSchema = new mongoose.Schema({
     club: {
         type: Object,
         required: false
+    },
+    discord_auth: {
+        type: Object,
+        required: false
+    },
+    socials: {
+        type: Object,
+        required: false
     }
 })
 
