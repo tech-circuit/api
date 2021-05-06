@@ -6,6 +6,8 @@ require('dotenv').config();
 
 const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
+const workRouter = require('./routes/work');
+const projectRouter = require('./routes/project');
 
 const db = process.env.MONGODB_URL;
 
@@ -33,5 +35,7 @@ app.use(cors());
 
 app.use('/', indexRouter);
 app.use('/user', userRouter);
+app.use('/work', workRouter);
+app.use('/project', projectRouter);
 
 module.exports = app;

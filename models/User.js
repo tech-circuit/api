@@ -44,6 +44,14 @@ const UserSchema = new mongoose.Schema({
     socials: {
         type: Object,
         required: false
+    },
+    admin: {
+        type: Boolean,
+        default: false
+    },
+    upvotes: {
+        type: Object,
+        default: {}
     }
 })
 
