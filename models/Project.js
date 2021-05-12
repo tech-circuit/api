@@ -33,9 +33,13 @@ const ProjectSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    upvotes: {
-        type: Number,
-        default: 0
+    tags: {
+        type: Array,
+        default: []
+    },
+    for_event: {
+        type: String,
+        required: false
     }
 })
 
