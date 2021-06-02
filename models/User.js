@@ -33,16 +33,36 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    club: {
-        type: Object,
+    about: {
+        type: String,
+        required: false
+    },
+    org: {
+        type: String,
+        required: false
+    },
+    title: {
+        type: String,
+        required: false
+    },
+    country: {
+        type: String,
+        required: false
+    },
+    city: {
+        type: String,
+        required: false
+    },
+    skills: {
+        type: Array,
         required: false
     },
     discord_auth: {
         type: Object,
         required: false
     },
-    socials: {
-        type: Object,
+    links: {
+        type: Array,
         required: false
     },
     admin: {

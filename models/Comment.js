@@ -15,10 +15,7 @@ const CommentSchema = new mongoose.Schema({
     },
     details: {
         type: Object,
-        required: {
-            type: '',
-            id: ''
-        }
+        required: true
     }
 })
 

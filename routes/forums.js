@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const axios = require('axios')
 
 router.get('/', (req, res) => {
-    res.redirect('https://github.com/tech-circuit/api')
+    res.send('post')
 });
 
 module.exports = router

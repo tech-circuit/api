@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
-const ClubSchema = new mongoose.Schema({
+const OrgSchema = new mongoose.Schema({
     id: {
         type: String,
         required: false
     },
     members: {
-        type: Object,
+        type: Array,
         required: true
     },
     name: {
@@ -34,11 +34,15 @@ const ClubSchema = new mongoose.Schema({
         required: true
     },
     links: {
-        type: Object,
+        type: Array,
+        required: false
+    },
+    alumni: {
+        type: Array,
         required: false
     }
 })
 
-const Club = mongoose.model('Club', ClubSchema);
+const Org = mongoose.model('Org', OrgSchema);
 
-module.exports = Club;
+module.exports = Org;

@@ -40,6 +40,10 @@ const ProjectSchema = new mongoose.Schema({
     for_event: {
         type: String,
         required: false
+    },
+    upvotes: {
+        type: Number,
+        default: 0
     }
 })
 
