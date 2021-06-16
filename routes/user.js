@@ -10,6 +10,8 @@ router.post('/gauth', (req, res) => {
         User.findOne({ google_id: req.body.googleId }).then((user) => {
             if (!user) {
                 let username = req.body.email.split('@')[0]
+                req.body.imageUrl = req.body.imageUrl.slice(0, -4)
+                req.body.imageUrl = `${req.body.imageUrl}1000-c`
                 let newUser = User({
                     email: req.body.email,
                     name: req.body.name,
