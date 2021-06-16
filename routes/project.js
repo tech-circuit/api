@@ -1,8 +1,8 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 const Project = require('../models/Project')
 const User = require('../models/User')
-const fields = require('../data/fields');
+const fields = require('../data/fields')
 
 router.post('/add', (req, res) => {
     const user = User.findOne({ access_token: req.query.access_token })
@@ -19,20 +19,20 @@ router.post('/add', (req, res) => {
             tags: req.body.tags,
             for_event: req.body.for_event
         })
-    project.fields.forEach(field => {
-        if (fields.design[field]) {
-            if (!projects.fields.includes('design')) {
-                projects.fields.push('design')
+        project.fields.forEach(field => {
+            if (fields.design[field]) {
+                if (!projects.fields.includes('design')) {
+                    projects.fields.push('design')
+                }
+            } else if (fields.code[field]) {
+                if (!projects.fields.includes('code')) {
+                    projects.fields.push('code')
+                }
             }
-        } else if (fields.code[field]) {
-            if (!projects.fields.includes('code')) {
-                projects.fields.push('code')
-            }
-        }
-    })
-    project.save()
-    } catch (err){
-        res.json({success: false, error: err})
+        })
+        project.save()
+    } catch (err) {
+        res.json({ success: false, error: err })
     }
 });
 
