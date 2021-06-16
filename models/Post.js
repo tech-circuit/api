@@ -20,6 +20,10 @@ const PostSchema = new mongoose.Schema({
     upvotes: {
         type: Array,
         default: []
+    },
+    is_draft: {
+        type: Boolean,
+        required: true
     }
 })
 

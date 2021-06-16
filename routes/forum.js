@@ -14,7 +14,8 @@ router.post('/new', async(req, res) => {
             author: user._id,
             date: Date.now(),
             title: req.body.title,
-            content: req.body.content
+            content: req.body.content,
+            is_draft: false
         })
         await post.save()
         res.sendStatus(200)
