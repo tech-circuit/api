@@ -68,6 +68,10 @@ const UserSchema = new mongoose.Schema({
     admin: {
         type: Boolean,
         default: false
+    },
+    saves: {
+        type: Array,
+        default: []
     }
 })
 
