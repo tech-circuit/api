@@ -173,11 +173,48 @@ router.post('/unupvote/:post_id', async(req, res) => {
             while (i--) {
                 if (post.upvotes[i] &&
                     post.upvotes[i].hasOwnProperty(user) &&
-                    (arguments.length > 2 && post.upvotes[i][user] === user._id)) {
+                    (arguments.length > 2 && String(post.upvotes[i][user]) === String(user._id))) {
                     post.upvotes.splice(i, 1);
                 }
             }
             await Post.findOneAndUpdate({ _id: req.params.post_id }, { upvotes: post.upvotes })
+            res.json({ success: true })
+        } else {
+            res.json({ success: false, error: 'Post not found.' })
+        }
+    } else {
+        res.json({ success: false, error: 'User not found.' })
+    }
+})
+
+router.post('/save/:post_id', async(req, res) => {
+    let user = await User.findOne({ access_token: req.query.access_token })
+    if (user) {
+        let post = await Post.findOne({ _id: req.params.post_id })
+        if (post) {
+            user.saves.push(post._id)
+            await User.findOneAndUpdate({ _id: user._id }, { saves: user.saves })
+            res.json({ success: true })
+        } else {
+            res.json({ success: false, error: 'Post not found.' })
+        }
+    } else {
+        res.json({ success: false, error: 'User not found.' })
+    }
+})
+
+router.post('/unsave/:post_id', async(req, res) => {
+    let user = await User.findOne({ access_token: req.query.access_token })
+    if (user) {
+        let post = await Post.findOne({ _id: req.params.post_id })
+        if (post) {
+            for (let i = 0; i < user.saves.length; i++) {
+                if (String(user.saves[i]) == String(req.params.post_id)) {
+                    user.saves.splice(i, 1)
+                    break
+                }
+            }
+            await User.findOneAndUpdate({ _id: user._id }, { saves: user.saves })
             res.json({ success: true })
         } else {
             res.json({ success: false, error: 'Post not found.' })
