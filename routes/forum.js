@@ -18,7 +18,7 @@ router.post('/new', async(req, res) => {
             is_draft: false
         })
         await post.save()
-        res.sendStatus(200)
+        res.json({ success: true })
     } else {
         res.json({ success: false, error: 'User not found.' })
     }
@@ -31,7 +31,7 @@ router.post('/upvote/:post_id', async(req, res) => {
         if (post) {
             post.upvotes.push({ user: user._id, date: Date.now() })
             await Post.findOneAndUpdate({ _id: req.params.post_id }, { upvotes: post.upvotes })
-            res.sendStatus(200)
+            res.json({ success: true })
         } else {
             res.json({ success: false, error: 'Post not found.' })
         }
@@ -54,7 +54,7 @@ router.post('/unupvote/:post_id', async(req, res) => {
                 }
             }
             await Post.findOneAndUpdate({ _id: req.params.post_id }, { upvotes: post.upvotes })
-            res.sendStatus(200)
+            res.json({ success: true })
         } else {
             res.json({ success: false, error: 'Post not found.' })
         }
