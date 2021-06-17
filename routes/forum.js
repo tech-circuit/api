@@ -36,14 +36,14 @@ router.get('/', async(req, res) => {
                 responsePost.author = author.username
                 if (user) {
                     posts[index].upvotes.every(upvote => {
-                        if (upvote.user == user._id) {
+                        if (String(upvote.user) == String(user._id)) {
                             responsePost.is_upvoted = true
                             return false
                         }
                         return true
                     })
                     user.saves.every(save => {
-                        if (save == posts[index]._id) {
+                        if (String(save) == String(posts[index]._id)) {
                             responsePost.is_saved = true
                             return false
                         }
