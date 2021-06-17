@@ -19,7 +19,7 @@ router.get('/', async(req, res) => {
         response.drafts = drafts.length
     }
     await Post.find({ is_draft: false })
-        .sort({ date: 'asc' })
+        .sort({ date: 'dsc' })
         .then(async(posts) => {
             for (let index = 0; index < posts.length; index++) {
                 responsePost = {
@@ -53,7 +53,12 @@ router.get('/', async(req, res) => {
                 responsePost.comments = comments.length
                 response.posts.push(responsePost)
             }
-            res.json(response)
+            if (sort == 'latest') {
+                res.json(response)
+            } else if (sort == 'hottest') {
+
+            }
+
         })
 })
 
