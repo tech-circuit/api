@@ -4,7 +4,8 @@ const Post = require('../models/Post')
 const User = require('../models/User')
 const Comment = require('../models/Comment')
 
-router.get('/latest', async(req, res) => {
+router.get('/', async(req, res) => {
+    let sort = req.query.sort
     let user = await User.findOne({ access_token: req.query.access_token })
     let response = {
         success: true,
@@ -64,7 +65,7 @@ router.post('/new', async(req, res) => {
             date: Date.now(),
             title: req.body.title,
             content: req.body.content,
-            is_draft: false
+            is_draft: req.body.is_draft
         })
         await post.save()
         res.json({ success: true })
