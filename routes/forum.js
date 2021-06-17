@@ -16,22 +16,24 @@ router.get('/latest', async(req, res) => {
         response.authenticated = true
         let drafts = await Post.find({ is_draft: true, author: user._id })
         response.drafts = drafts.length
-        await Post.find({ is_draft: false })
-            .sort({ date: 'asc' })
-            .then(async(posts) => {
-                posts.forEach(async(post, index) => {
-                    responsePost = {
-                        title: post.title,
-                        content: post.content,
-                        is_upvoted: false,
-                        is_saved: false,
-                        author: '',
-                        date: post.date,
-                        comments: 0
-                    }
-                    let author = await User.findOne({ _id: post.author })
-                    responsePost.author = author.username
-                    post.upvotes.every(upvote => {
+    }
+    await Post.find({ is_draft: false })
+        .sort({ date: 'asc' })
+        .then(async(posts) => {
+            for (let index = 0; index < posts.length; index++) {
+                responsePost = {
+                    title: posts[index].title,
+                    content: posts[index].content,
+                    is_upvoted: false,
+                    is_saved: false,
+                    author: '',
+                    date: posts[index].date,
+                    comments: 0
+                }
+                let author = await User.findOne({ _id: posts[index].author })
+                responsePost.author = author.username
+                if (user) {
+                    posts[index].upvotes.every(upvote => {
                         if (upvote.user == user._id) {
                             responsePost.is_upvoted = true
                             return false
@@ -39,23 +41,19 @@ router.get('/latest', async(req, res) => {
                         return true
                     })
                     user.saves.every(save => {
-                        if (save == post._id) {
+                        if (save == posts[index]._id) {
                             responsePost.is_saved = true
                             return false
                         }
                         return true
                     })
-                    let comments = await Comment.find({ details: { type: 'post', id: post._id } })
-                    responsePost.comments = comments.length
-                    response.posts.push(responsePost)
-                    if (index == (posts.length - 1)) {
-                        res.json(response)
-                    }
-                })
-            })
-    } else {
-
-    }
+                }
+                let comments = await Comment.find({ details: { type: 'post', id: posts[index]._id } })
+                responsePost.comments = comments.length
+                response.posts.push(responsePost)
+            }
+            res.json(response)
+        })
 })
 
 router.post('/new', async(req, res) => {
