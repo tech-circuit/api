@@ -19,7 +19,7 @@ router.get('/', async(req, res) => {
         response.drafts = drafts.length
     }
     await Post.find({ is_draft: false })
-        .sort({ date: 'dsc' })
+        .sort({ date: -1 })
         .then(async(posts) => {
             for (let index = 0; index < posts.length; index++) {
                 responsePost = {
