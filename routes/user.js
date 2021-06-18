@@ -5,9 +5,9 @@ const User = require('../models/User')
 
 const DISCORD_CLIENT_ID = '830041863247495168'
 
-router.post('/gauth', (req, res) => {
+router.post('/gauth', async(req, res) => {
     try {
-        User.findOne({ google_id: req.body.googleId }).then((user) => {
+        User.findOne({ google_id: req.body.googleId }).then(async(user) => {
             if (!user) {
                 let username = req.body.email.split('@')[0]
                 req.body.imageUrl = req.body.imageUrl.slice(0, -4)
@@ -24,8 +24,10 @@ router.post('/gauth', (req, res) => {
                 })
                 newUser.save()
             } else {
-                user.access_token = req.body.access_token
-                user.save()
+                if (req.body.access_token != user.access_token) {
+                    user.access_token = req.body.access_token
+                    await user.save()
+                }
             }
         })
         res.sendStatus(200)
