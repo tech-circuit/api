@@ -3,6 +3,10 @@ const router = express.Router()
 const Post = require('../models/Post')
 const User = require('../models/User')
 const Comment = require('../models/Comment')
+const createDOMPurify = require('dompurify');
+const { JSDOM } = require('jsdom');
+const window = new JSDOM('').window;
+const DOMPurify = createDOMPurify(window);
 
 router.get('/', async(req, res) => {
     let sort = req.query.sort
@@ -62,6 +66,57 @@ router.get('/', async(req, res) => {
         })
 })
 
+router.get('/search', async(req, res) => {
+    let query = req.query.q
+    let user = await User.findOne({ access_token: req.query.access_token })
+    let response = {
+        success: true,
+        authenticated: false,
+        drafts: 0,
+        posts: []
+    }
+    if (user) {
+        response.authenticated = true
+        let drafts = await Post.find({ is_draft: true, author: user._id })
+        response.drafts = drafts.length
+    }
+    let posts = await Post.find({ $or: [{ title: { $regex: query, $options: "$i" } }, { content: { $regex: query, $options: "$i" } }] }).sort({ date: -1 })
+    for (let index = 0; index < posts.length; index++) {
+        responsePost = {
+            id: posts[index]._id,
+            title: posts[index].title,
+            content: posts[index].content,
+            is_upvoted: false,
+            is_saved: false,
+            author: '',
+            date: posts[index].date,
+            comments: 0
+        }
+        let author = await User.findOne({ _id: posts[index].author })
+        responsePost.author = author.username
+        if (user) {
+            posts[index].upvotes.every(upvote => {
+                if (String(upvote.user) == String(user._id)) {
+                    responsePost.is_upvoted = true
+                    return false
+                }
+                return true
+            })
+            user.saves.every(save => {
+                if (String(save) == String(posts[index]._id)) {
+                    responsePost.is_saved = true
+                    return false
+                }
+                return true
+            })
+        }
+        let comments = await Comment.find({ details: { type: 'post', id: posts[index]._id } })
+        responsePost.comments = comments.length
+        response.posts.push(responsePost)
+    }
+    res.json(response)
+})
+
 router.get('/post/:id', async(req, res) => {
     let user = await User.findOne({ access_token: req.query.access_token })
     let post = await Post.findOne({ _id: req.params.id })
@@ -115,6 +170,8 @@ router.get('/post/:id', async(req, res) => {
 router.post('/new', async(req, res) => {
     let user = await User.findOne({ access_token: req.query.access_token })
     if (user) {
+        req.body.title = DOMPurify.sanitize(req.body.title, { USE_PROFILES: { html: true } })
+        req.body.content = DOMPurify.sanitize(req.body.content, { USE_PROFILES: { html: true } });
         let post = new Post({
             author: user._id,
             date: Date.now(),
