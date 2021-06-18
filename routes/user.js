@@ -66,4 +66,13 @@ router.get('/discordauth/callback', async(req, res) => {
     }
 })
 
+router.get('/pfp', async(req, res) => {
+    let user = await User.findOne({ access_token: req.query.access_token })
+    if (user) {
+        res.redirect(user.pfp_url)
+    } else {
+        res.sendStatus(404)
+    }
+})
+
 module.exports = router
