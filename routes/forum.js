@@ -9,112 +9,130 @@ const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
 
 router.get('/', async(req, res) => {
-    let sort = req.query.sort
-    let user = await User.findOne({ access_token: req.query.access_token })
-    let response = {
-        success: true,
-        authenticated: false,
-        drafts: 0,
-        posts: []
-    }
-    if (user) {
-        response.authenticated = true
-        let drafts = await Post.find({ is_draft: true, author: user._id })
-        response.drafts = drafts.length
-    }
-    await Post.find({ is_draft: false })
-        .sort({ date: -1 })
-        .then(async(posts) => {
-            for (let index = 0; index < posts.length; index++) {
-                responsePost = {
-                    id: posts[index]._id,
-                    title: posts[index].title,
-                    content: posts[index].content,
-                    is_upvoted: false,
-                    is_saved: false,
-                    author: '',
-                    date: posts[index].date,
-                    comments: 0
+    if (req.query.page) {
+        let sort = req.query.sort
+        let skipIndex = (req.query.page - 1) * 20;
+        let user = await User.findOne({ access_token: req.query.access_token })
+        let response = {
+            total_pages: 0,
+            success: true,
+            authenticated: false,
+            drafts: 0,
+            posts: []
+        }
+        let postsPages = await Post.find({ is_draft: false })
+        response.total_pages = Math.ceil(postsPages.length / 20)
+        if (user) {
+            response.authenticated = true
+            let drafts = await Post.find({ is_draft: true, author: user._id })
+            response.drafts = drafts.length
+        }
+        await Post.find({ is_draft: false })
+            .sort({ date: -1 })
+            .limit(20)
+            .skip(skipIndex)
+            .then(async(posts) => {
+                for (let index = 0; index < posts.length; index++) {
+                    responsePost = {
+                        id: posts[index]._id,
+                        title: posts[index].title,
+                        content: posts[index].content,
+                        is_upvoted: false,
+                        is_saved: false,
+                        author: '',
+                        date: posts[index].date,
+                        comments: 0
+                    }
+                    let author = await User.findOne({ _id: posts[index].author })
+                    responsePost.author = author.username
+                    if (user) {
+                        posts[index].upvotes.every(upvote => {
+                            if (String(upvote.user) == String(user._id)) {
+                                responsePost.is_upvoted = true
+                                return false
+                            }
+                            return true
+                        })
+                        user.saves.every(save => {
+                            if (String(save) == String(posts[index]._id)) {
+                                responsePost.is_saved = true
+                                return false
+                            }
+                            return true
+                        })
+                    }
+                    let comments = await Comment.find({ details: { type: 'post', id: posts[index]._id } })
+                    responsePost.comments = comments.length
+                    response.posts.push(responsePost)
                 }
-                let author = await User.findOne({ _id: posts[index].author })
-                responsePost.author = author.username
-                if (user) {
-                    posts[index].upvotes.every(upvote => {
-                        if (String(upvote.user) == String(user._id)) {
-                            responsePost.is_upvoted = true
-                            return false
-                        }
-                        return true
-                    })
-                    user.saves.every(save => {
-                        if (String(save) == String(posts[index]._id)) {
-                            responsePost.is_saved = true
-                            return false
-                        }
-                        return true
-                    })
-                }
-                let comments = await Comment.find({ details: { type: 'post', id: posts[index]._id } })
-                responsePost.comments = comments.length
-                response.posts.push(responsePost)
-            }
-            if (sort == 'latest') {
-                res.json(response)
-            } else if (sort == 'hottest') {
+                if (sort == 'latest') {
+                    res.json(response)
+                } else if (sort == 'hottest') {
 
-            }
-        })
+                }
+            })
+    } else {
+        res.json({ success: false, error: 'Invalid page number.' })
+    }
 })
 
 router.get('/search', async(req, res) => {
-    let query = req.query.q
-    let user = await User.findOne({ access_token: req.query.access_token })
-    let response = {
-        success: true,
-        authenticated: false,
-        drafts: 0,
-        posts: []
-    }
-    if (user) {
-        response.authenticated = true
-        let drafts = await Post.find({ is_draft: true, author: user._id })
-        response.drafts = drafts.length
-    }
-    let posts = await Post.find({ $or: [{ title: { $regex: query, $options: "$i" } }, { content: { $regex: query, $options: "$i" } }] }).sort({ date: -1 })
-    for (let index = 0; index < posts.length; index++) {
-        responsePost = {
-            id: posts[index]._id,
-            title: posts[index].title,
-            content: posts[index].content,
-            is_upvoted: false,
-            is_saved: false,
-            author: '',
-            date: posts[index].date,
-            comments: 0
+    if (req.query.page) {
+        let skipIndex = (req.query.page - 1) * 20;
+        let query = req.query.q
+        let user = await User.findOne({ access_token: req.query.access_token })
+        let response = {
+            total_pages: 0,
+            success: true,
+            authenticated: false,
+            drafts: 0,
+            posts: []
         }
-        let author = await User.findOne({ _id: posts[index].author })
-        responsePost.author = author.username
         if (user) {
-            posts[index].upvotes.every(upvote => {
-                if (String(upvote.user) == String(user._id)) {
-                    responsePost.is_upvoted = true
-                    return false
-                }
-                return true
-            })
-            user.saves.every(save => {
-                if (String(save) == String(posts[index]._id)) {
-                    responsePost.is_saved = true
-                    return false
-                }
-                return true
-            })
+            response.authenticated = true
+            let drafts = await Post.find({ is_draft: true, author: user._id })
+            response.drafts = drafts.length
         }
-        let comments = await Comment.find({ details: { type: 'post', id: posts[index]._id } })
-        responsePost.comments = comments.length
-        response.posts.push(responsePost)
+        let postsPages = await Post.find({ $or: [{ title: { $regex: query, $options: "$i" } }, { content: { $regex: query, $options: "$i" } }] })
+        response.total_pages = Math.ceil(postsPages.length / 20)
+        let posts = await Post.find({ $or: [{ title: { $regex: query, $options: "$i" } }, { content: { $regex: query, $options: "$i" } }] }).sort({ date: -1 }).limit(20).skip(skipIndex)
+        for (let index = 0; index < posts.length; index++) {
+            responsePost = {
+                id: posts[index]._id,
+                title: posts[index].title,
+                content: posts[index].content,
+                is_upvoted: false,
+                is_saved: false,
+                author: '',
+                date: posts[index].date,
+                comments: 0
+            }
+            let author = await User.findOne({ _id: posts[index].author })
+            responsePost.author = author.username
+            if (user) {
+                posts[index].upvotes.every(upvote => {
+                    if (String(upvote.user) == String(user._id)) {
+                        responsePost.is_upvoted = true
+                        return false
+                    }
+                    return true
+                })
+                user.saves.every(save => {
+                    if (String(save) == String(posts[index]._id)) {
+                        responsePost.is_saved = true
+                        return false
+                    }
+                    return true
+                })
+            }
+            let comments = await Comment.find({ details: { type: 'post', id: posts[index]._id } })
+            responsePost.comments = comments.length
+            response.posts.push(responsePost)
+        }
+        res.json(response)
+    } else {
+        res.json({ success: false, error: 'Invalid page number.' })
     }
-    res.json(response)
 })
 
 router.get('/post/:id', async(req, res) => {
