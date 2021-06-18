@@ -249,12 +249,9 @@ router.post('/unupvote/:post_id', async(req, res) => {
     if (user) {
         let post = await Post.findOne({ _id: req.params.post_id })
         if (post) {
-            let i = post.upvotes.length;
-            while (i--) {
-                if (post.upvotes[i] &&
-                    post.upvotes[i].hasOwnProperty(user) &&
-                    (arguments.length > 2 && String(post.upvotes[i][user]) === String(user._id))) {
-                    post.upvotes.splice(i, 1);
+            for (var i = post.upvotes.length - 1; i >= 0; --i) {
+                if (String(post.upvotes[i].user) == String(user._id)) {
+                    post.upvotes.splice(i, 1)
                 }
             }
             await Post.findOneAndUpdate({ _id: req.params.post_id }, { upvotes: post.upvotes })
