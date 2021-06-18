@@ -61,7 +61,7 @@ router.get('/', async(req, res) => {
                             return true
                         })
                     }
-                    let comments = await Comment.find({ details: { type: 'post', id: posts[index]._id } })
+                    let comments = await Comment.find({ details: { type: 'post', id: String(posts[index]._id) } })
                     responsePost.comments = comments.length
                     response.posts.push(responsePost)
                 }
@@ -125,7 +125,7 @@ router.get('/search', async(req, res) => {
                     return true
                 })
             }
-            let comments = await Comment.find({ details: { type: 'post', id: posts[index]._id } })
+            let comments = await Comment.find({ details: { type: 'post', id: String(posts[index]._id) } })
             responsePost.comments = comments.length
             response.posts.push(responsePost)
         }
