@@ -174,14 +174,19 @@ router.get('/post/:id', async(req, res) => {
             return true
         })
     }
-    let comments = await Comment.find({ details: { type: 'post', id: post._id } }).sort({ date: -1 })
+    let comments = await Comment.find({ details: { type: 'post', id: req.params.id } }).sort({ date: -1 })
+    let responseComments = []
     for (let i = 0; i < comments.length; i++) {
         let commentAuthor = await User.findOne({ _id: comments[i].author })
-        comments[i].author_name = commentAuthor.name
-        comments[i].author_username = commentAuthor.username
-        comments[i].pfp_url = commentAuthor.pfp_url
+        responseComments.push({
+            comment: comments[i].comment,
+            author_username: commentAuthor.username,
+            author_pfp_url: commentAuthor.pfp_url,
+            date: comments[i].date,
+            id: comments[i]._id
+        })
     }
-    response.comments = comments
+    response.comments = responseComments
     res.json(response)
 })
 
