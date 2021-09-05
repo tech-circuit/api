@@ -9,7 +9,8 @@ const userRouter = require('./routes/user');
 const workRouter = require('./routes/work');
 const projectRouter = require('./routes/project');
 const imageRouter = require('./routes/image');
-const forumRouter = require('./routes/forum')
+const forumRouter = require('./routes/forum');
+const mailingListRouter = require('./routes/mailingList');
 
 const db = process.env.MONGODB_URL;
 
@@ -40,6 +41,7 @@ app.use('/user', userRouter);
 app.use('/work', workRouter);
 app.use('/project', projectRouter);
 app.use('/image', imageRouter);
-app.use('/forum', forumRouter)
+app.use('/forum', forumRouter);
+app.use('/ml', mailingListRouter);
 
 module.exports = app;
