@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const MailingListEmail = require('../models/mailingListEmail')
+const MailingListEmail = require('../models/MailingListEmail')
 
 router.post('/subscribe', async(req, res) => {
     let mailingListEmail = new MailingListEmail({
