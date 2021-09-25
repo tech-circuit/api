@@ -3,6 +3,7 @@ const router = express.Router()
 const Post = require('../models/Post')
 const User = require('../models/User')
 const Comment = require('../models/Comment')
+const Report = require('../models/Report')
 const createDOMPurify = require('dompurify');
 const { JSDOM } = require('jsdom');
 const window = new JSDOM('').window;
@@ -296,6 +297,21 @@ router.post('/unsave/:post_id', async(req, res) => {
         } else {
             res.json({ success: false, error: 'Post not found.' })
         }
+    } else {
+        res.json({ success: false, error: 'User not found.' })
+    }
+})
+
+router.post('/report/new', async(req, res) => {
+    let user = await User.findOne({ access_token: req.query.access_token })
+    if (user) {
+        let report = new Report({
+            author: user._id,
+            post: req.body.post_id,
+            message: req.body.message
+        })
+        await report.save()
+        res.json({ success: true })
     } else {
         res.json({ success: false, error: 'User not found.' })
     }
