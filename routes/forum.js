@@ -30,8 +30,6 @@ router.get('/', async(req, res) => {
         }
         await Post.find({ is_draft: false })
             .sort({ date: -1 })
-            .limit(20)
-            .skip(skipIndex)
             .then(async(posts) => {
                 for (let index = 0; index < posts.length; index++) {
                     responsePost = {
@@ -42,7 +40,7 @@ router.get('/', async(req, res) => {
                         is_saved: false,
                         author: '',
                         date: posts[index].date,
-                        comments: 0
+                        comments: 0,
                     }
                     let author = await User.findOne({ _id: posts[index].author })
                     responsePost.author = author.username
@@ -67,9 +65,31 @@ router.get('/', async(req, res) => {
                     response.posts.push(responsePost)
                 }
                 if (sort == 'latest') {
+                    if (skipIndex != 0) {
+                        skipIndex -= 1
+                    }
+                    response.posts = response.posts.slice(skipIndex, skipIndex + 20)
+                    res.json(response)
+                } else if (sort == 'popular') {
+                    for (let index = 0; index < posts.length; index++) {
+                        response.posts[index].upvotes = posts[index].upvotes.length
+                    }
+                    response.posts.sort((a, b) => (a.upvotes > b.upvotes) ? -1 : 1)
+                    for (let index = 0; index < response.posts.length; index++) {
+                        delete response.posts[index].upvotes
+                    }
+                    if (skipIndex != 0) {
+                        skipIndex -= 1
+                    }
+                    response.posts = response.posts.slice(skipIndex, skipIndex + 20)
                     res.json(response)
                 } else if (sort == 'hottest') {
-
+                    response.posts.sort((a, b) => (a.comments > b.comments) ? -1 : 1)
+                    if (skipIndex != 0) {
+                        skipIndex -= 1
+                    }
+                    response.posts = response.posts.slice(skipIndex, skipIndex + 20)
+                    res.json(response)
                 }
             })
     } else {
@@ -94,9 +114,9 @@ router.get('/search', async(req, res) => {
             let drafts = await Post.find({ is_draft: true, author: user._id })
             response.drafts = drafts.length
         }
-        let postsPages = await Post.find({ $or: [{ title: { $regex: query, $options: "$i" } }, { content: { $regex: query, $options: "$i" } }] })
+        let postsPages = await Post.find({ $text: { $search: query } })
         response.total_pages = Math.ceil(postsPages.length / 20)
-        let posts = await Post.find({ $or: [{ title: { $regex: query, $options: "$i" } }, { content: { $regex: query, $options: "$i" } }] }).sort({ date: -1 }).limit(20).skip(skipIndex)
+        let posts = await Post.find({ $text: { $search: query } }).sort({ date: -1 }).limit(20).skip(skipIndex)
         for (let index = 0; index < posts.length; index++) {
             responsePost = {
                 id: posts[index]._id,
