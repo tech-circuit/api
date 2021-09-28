@@ -188,7 +188,7 @@ router.get('/post/:id', async(req, res) => {
             return true
         })
         user.saves.every(save => {
-            if (String(save) == String(posts[index]._id)) {
+            if (String(save) == String(post._id)) {
                 response.is_saved = true
                 return false
             }
