@@ -40,6 +40,7 @@ router.get('/', async(req, res) => {
                         is_upvoted: false,
                         is_saved: false,
                         author: '',
+                        user_id: user._id,
                         date: posts[index].date,
                         comments: 0
                     }
@@ -68,7 +69,7 @@ router.get('/', async(req, res) => {
                 if (sort == 'latest') {
                     res.json(response)
                 } else if (sort == 'hottest') {
-
+                    res.json(response);
                 }
             })
     } else {
