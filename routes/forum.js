@@ -350,7 +350,7 @@ router.get('/delete/:post_id', (req, res) => {
     if (user) {
         const post = Post.findOne({ _id: req.params.post_id })
         if (post.author == user._id) {
-            post.remove()
+            Post.findOneAndRemove({ _id: req.params.post_id })
             res.json({ success: true })
         } else {
             res.json({ success: false, error: 'User not authorized.' })
