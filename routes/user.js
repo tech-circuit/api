@@ -36,15 +36,6 @@ router.post('/gauth', async(req, res) => {
     }
 });
 
-router.get("/userID", async (req, res) => {
-    try {
-        const user = await User.findOne({ access_token: req.query.access_token})
-        res.json({ user_id: user._id })
-    } catch (err) {
-        res.json({ err: err })
-    }
-})
-
 router.get('/discordauth', (req, res) => {
     res.redirect(`https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${process.env.BASE_URL}%2Fuser%2Fdiscordauth%2Fcallback&response_type=code&scope=identify&state=${req.query.access_token}`)
 })

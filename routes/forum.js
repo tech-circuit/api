@@ -39,13 +39,11 @@ router.get('/', async(req, res) => {
                         is_upvoted: false,
                         is_saved: false,
                         author: '',
-                        user_id: "",
                         date: posts[index].date,
                         comments: 0,
                     }
                     let author = await User.findOne({ _id: posts[index].author })
                     responsePost.author = author.username
-                    responsePost.user_id = author._id;
                     if (user) {
                         posts[index].upvotes.every(upvote => {
                             if (String(upvote.user) == String(user._id)) {
