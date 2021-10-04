@@ -345,4 +345,19 @@ router.post('/report/new', async(req, res) => {
     }
 })
 
+router.get('/delete/:post_id', (req, res) => {
+    const user = User.findOne({ access_token: req.query.access_token })
+    if (user) {
+        const post = Post.findOne({ _id: req.params.post_id })
+        if (post.author == user._id) {
+            post.remove()
+            res.json({ success: true })
+        } else {
+            res.json({ success: false, error: 'User not authorized.' })
+        }
+    } else {
+        res.json({ success: false, error: 'User not found.' })
+    }
+})
+
 module.exports = router
