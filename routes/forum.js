@@ -261,8 +261,15 @@ router.post("/comment/delete", async (req, res) => {
     let user = await User.findOne({ access_token: req.query.access_token });
     try {
         if (user) {
-            await Comment.deleteOne({ _id: req.query.comment_id, author: user._id });
-            res.json({ success: true });
+            const deled = await Comment.findOne({ _id: req.query.comment_id, author: user._id });
+            if (deled) {
+                await Comment.deleteOne({
+                    _id: req.query.comment_id,
+                    author: user._id,
+                });
+                res.json({ success: true });
+            }
+            res.json({ success: false, error: "User invalid." });
         } else {
             res.json({ success: false, error: "User not found." });
         }
