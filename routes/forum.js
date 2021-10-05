@@ -38,12 +38,16 @@ router.get('/', async(req, res) => {
                         content: posts[index].content,
                         is_upvoted: false,
                         is_saved: false,
+                        is_mine: false,
                         author: '',
                         date: posts[index].date,
                         comments: 0,
                     }
                     let author = await User.findOne({ _id: posts[index].author })
                     responsePost.author = author.username
+                    if (author.access_token === req.query.access_token) {
+                        responsePost.is_mine = true
+                    }
                     if (user) {
                         posts[index].upvotes.every(upvote => {
                             if (String(upvote.user) == String(user._id)) {
@@ -168,6 +172,7 @@ router.get('/post/:id', async(req, res) => {
         content: post.content,
         is_upvoted: false,
         is_saved: false,
+        is_mine: false,
         author: '',
         date: post.date,
         comments: []
@@ -179,6 +184,9 @@ router.get('/post/:id', async(req, res) => {
     }
     let author = await User.findOne({ _id: post.author })
     response.author = author.username
+    if (author.access_token === req.query.access_token) {
+        response.is_mine = true
+    }
     if (user) {
         post.upvotes.every(upvote => {
             if (String(upvote.user) == String(user._id)) {
@@ -346,6 +354,21 @@ router.post('/report/new', async(req, res) => {
         })
         await report.save()
         res.json({ success: true })
+    } else {
+        res.json({ success: false, error: 'User not found.' })
+    }
+})
+
+router.get('/delete/:post_id', async (req, res) => {
+    const user = await User.findOne({ access_token: req.query.access_token })
+    if (user) {
+        const post = await Post.findOne({ _id: req.params.post_id })
+        if (post.author == user._id) {
+            await Post.findOneAndRemove({ _id: req.params.post_id })
+            res.json({ success: true })
+        } else {
+            res.json({ success: false, error: 'User not authorized.' })
+        }
     } else {
         res.json({ success: false, error: 'User not found.' })
     }
