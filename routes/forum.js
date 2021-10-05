@@ -249,6 +249,20 @@ router.post('/comment/new', async(req, res) => {
     }
 })
 
+router.post("/comment/delete", async (req, res) => {
+    let user = await User.findOne({ access_token: req.query.access_token });
+    try {
+        if (user) {
+            await Comment.deleteOne({ _id: req.query.comment_id })
+            res.json({ success: true });
+        } else {
+            res.json({ success: false, error: "User not found." });
+        }
+    } catch(err) {
+        res.json({ success: false, error: "Some error occurred" });
+    }
+});
+
 router.post('/upvote/:post_id', async(req, res) => {
     let user = await User.findOne({ access_token: req.query.access_token })
     if (user) {
