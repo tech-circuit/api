@@ -207,14 +207,21 @@ router.get('/post/:id', async(req, res) => {
     let responseComments = []
     for (let i = 0; i < comments.length; i++) {
         let commentAuthor = await User.findOne({ _id: comments[i].author })
+        let commentIsMine = false
+        if (user) {
+            commentIsMine =
+                comments[i].author.toString().trim() === user._id.toString().trim()
+                    ? true
+                    : false;
+        }
         responseComments.push({
             comment: comments[i].comment,
             author_username: commentAuthor.username,
             author_pfp_url: commentAuthor.pfp_url,
             date: comments[i].date,
             id: comments[i]._id,
-            is_mine: commentAuthor._id === user._id ? true : false,
-        })
+            is_mine: commentIsMine,
+        });
     }
     response.comments = responseComments
     res.json(response)

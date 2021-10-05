@@ -16,7 +16,7 @@ const db = process.env.MONGODB_URL;
 
 const app = express();
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 const server = app.listen(port, (err) => {
     console.log(`API listening on ${port}!`);
     if (err) throw err;
