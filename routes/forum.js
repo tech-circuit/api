@@ -212,7 +212,8 @@ router.get('/post/:id', async(req, res) => {
             author_username: commentAuthor.username,
             author_pfp_url: commentAuthor.pfp_url,
             date: comments[i].date,
-            id: comments[i]._id
+            id: comments[i]._id,
+            is_mine: commentAuthor._id === user._id ? true : false,
         })
     }
     response.comments = responseComments
