@@ -75,4 +75,15 @@ router.get('/pfp', async(req, res) => {
     }
 })
 
+router.get("/info", async (req, res) => {
+    const user = await User.findOne({ access_token: req.query.access_token })
+    res.json(user)
+})
+
+router.post('/update', async (req, res) => {
+    await User.updateOne({access_token: req.query.access_token}, {
+        $set: req.body
+    })
+})
+
 module.exports = router
