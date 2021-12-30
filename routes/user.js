@@ -89,8 +89,18 @@ router.get("/discordauth/callback", async (req, res) => {
     }
 });
 
+<<<<<<< HEAD
 router.get("/pfp", async (req, res) => {
     let user = await User.findOne({ access_token: req.query.access_token });
+=======
+router.get("/", async (req, res)=> {
+    let user = await User.find();
+    res.json(user);
+})
+
+router.get('/pfp', async(req, res) => {
+    let user = await User.findOne({ access_token: req.query.access_token })
+>>>>>>> f9d05e1729c903c3bd0ad0f70fd7c3644ffbd031
     if (user) {
         res.redirect(user.pfp_url);
     } else {
