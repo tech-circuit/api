@@ -142,4 +142,36 @@ router.get("/get", async (req, res) => {
     }
 });
 
+router.put("/user-details", async (req, res) => {
+    try {
+        const { about, org, title, country, city, skills, links } = req.body;
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+
+        if (user) {
+            await User.updateOne(
+                { access_token: req.query.access_token },
+                {
+                    $set: {
+                        about: about ? about : "",
+                        org: org ? org : "",
+                        title: title ? title : "",
+                        country: country ? country : "",
+                        city: city ? city : "",
+                        skills: skills ? skills : "",
+                        links: links ? links : "",
+                    },
+                }
+            );
+
+            res.json({ done: true });
+        } else {
+            res.json({ err: "User not found" });
+        }
+    } catch (err) {
+        res.json({ err: err });
+    }
+});
+
 module.exports = router;
