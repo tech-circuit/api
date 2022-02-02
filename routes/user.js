@@ -89,6 +89,14 @@ router.get("/discordauth/callback", async (req, res) => {
     }
 });
 
+router.get("/auth-pfp", async (req, res) => {
+    let user = await User.findOne({ access_token: req.query.access_token });
+    if (user) {
+        res.json({ pfp: user.pfp_url });
+    } else {
+        res.sendStatus(404);
+    }
+});
 router.get("/pfp", async (req, res) => {
     let user = await User.findOne({ access_token: req.query.access_token });
     if (user) {
@@ -100,7 +108,7 @@ router.get("/pfp", async (req, res) => {
 
 router.get("/info", async (req, res) => {
     const user = await User.findOne({ access_token: req.query.access_token });
-    res.json(user);
+    res.json({ user });
 });
 
 router.post("/update", async (req, res) => {
@@ -144,7 +152,8 @@ router.get("/get", async (req, res) => {
 
 router.put("/user-details", async (req, res) => {
     try {
-        const { about, org, title, country, city, skills, links } = req.body;
+        const { username, about, org, title, country, city, skills, links } =
+            req.body;
         const user = await User.findOne({
             access_token: req.query.access_token,
         });
@@ -154,6 +163,7 @@ router.put("/user-details", async (req, res) => {
                 { access_token: req.query.access_token },
                 {
                     $set: {
+                        username: username ? username : "",
                         about: about ? about : "",
                         org: org ? org : "",
                         title: title ? title : "",
