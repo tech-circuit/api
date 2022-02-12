@@ -15,6 +15,10 @@ const EventSchema = new mongoose.Schema({
     },
     organisers: {
         type: String,
+        required: false
+    },
+    isIndependant: {
+        type: Boolean,
         required: true
     },
     description: {
@@ -41,6 +45,14 @@ const EventSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
+    event_start_time: {
+        type: Date,
+        required: true
+    },
+    event_end_time: {
+        type: Date,
+        required: true
+    },
     org: {
         type: String,
         required: false
@@ -60,7 +72,19 @@ const EventSchema = new mongoose.Schema({
     banner: {
         type: String,
         required: true
-    }
+    },
+    country: {
+        type: String,
+        required: true
+    },
+    state: {
+        type: String,
+        required: true
+    },
+    tags: {
+        type: Array,
+        default: []
+    },
 })
 
 const Event = mongoose.model('Event', EventSchema);

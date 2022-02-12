@@ -7,23 +7,27 @@ const OrgSchema = new mongoose.Schema({
     },
     members: {
         type: Array,
-        required: true
+        required: false //change to true?
     },
     name: {
         type: String,
         required: true
     },
-    founding_year: {
-        type: Number,
-        required: true
-    },
-    founder: {
-        type: String,
-        required: false
-    },
     description: {
         type: String,
         required: false
+    },
+    website_url: {
+        type: String,
+        required: false //change to true
+    },
+    institute: {
+        type: String,
+        required: true
+    },
+    isIndependant: {
+        type: Boolean,
+        required: false //change to true
     },
     logo_url: {
         type: String,
@@ -31,7 +35,7 @@ const OrgSchema = new mongoose.Schema({
     },
     admin: {
         type: Array,
-        required: true
+        required: false //change to true?
     },
     links: {
         type: Array,
