@@ -7,7 +7,7 @@ const OrgSchema = new mongoose.Schema({
     },
     members: {
         type: Array,
-        required: false //change to true?
+        required: true //change to true?
     },
     name: {
         type: String,
@@ -19,7 +19,7 @@ const OrgSchema = new mongoose.Schema({
     },
     website_url: {
         type: String,
-        required: false //change to true
+        required: false //change to true // nhi bhai nhi
     },
     institute: {
         type: String,
@@ -27,7 +27,7 @@ const OrgSchema = new mongoose.Schema({
     },
     isIndependant: {
         type: Boolean,
-        required: false //change to true
+        required: true //change to true
     },
     logo_url: {
         type: String,
@@ -44,7 +44,8 @@ const OrgSchema = new mongoose.Schema({
     alumni: {
         type: Array,
         required: false
-    }
+    },
+    requests: Array
 })
 
 const Org = mongoose.model('Org', OrgSchema);

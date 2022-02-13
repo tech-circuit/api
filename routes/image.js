@@ -16,7 +16,7 @@ router.post('/upload', cors(), (req, res) => {
             res.json(response.data.data)
         } else {
             res.json(response.data)
-        }
+        } 
     }).catch(error => {
         if (error.response) {
             console.log(error.response)

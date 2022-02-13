@@ -11,7 +11,6 @@ const UserSchema = new mongoose.Schema({
     },
     pfp_url: {
         type: String,
-        required: true
     },
     email: {
         type: String,

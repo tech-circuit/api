@@ -90,11 +90,15 @@ router.get("/discordauth/callback", async (req, res) => {
 });
 
 router.get("/auth-pfp", async (req, res) => {
-    let user = await User.findOne({ access_token: req.query.access_token });
-    if (user) {
-        res.json({ pfp: user.pfp_url });
+    if (req.query.access_token !== "") {
+        let user = await User.findOne({ access_token: req.query.access_token });
+        if (user) {
+            res.json({ pfp: user.pfp_url });
+        } else {
+            res.json({ pfp: false });
+        }
     } else {
-        res.sendStatus(404);
+        res.json({ pfp: false });
     }
 });
 router.get("/pfp", async (req, res) => {
