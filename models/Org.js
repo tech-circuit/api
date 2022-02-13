@@ -1,53 +1,52 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const OrgSchema = new mongoose.Schema({
     id: {
         type: String,
-        required: false
+        required: false,
     },
     members: {
         type: Array,
-        required: true //change to true?
+        required: false, //change to true?
     },
     name: {
         type: String,
-        required: true
+        required: true,
     },
     description: {
         type: String,
-        required: false
+        required: true,
     },
     website_url: {
         type: String,
-        required: false //change to true // nhi bhai nhi
+        required: false, //change to true // nhi bhai nhi
     },
     institute: {
         type: String,
-        required: true
     },
     isIndependant: {
         type: Boolean,
-        required: true //change to true
+        required: true, //change to true
     },
     logo_url: {
         type: String,
-        required: false
+        required: false,
     },
     admin: {
         type: Array,
-        required: false //change to true?
+        required: false, //change to true?
     },
     links: {
         type: Array,
-        required: false
+        required: false,
     },
     alumni: {
         type: Array,
-        required: false
+        required: false,
     },
-    requests: Array
-})
+    requests: Array,
+});
 
-const Org = mongoose.model('Org', OrgSchema);
+const Org = mongoose.model("Org", OrgSchema);
 
 module.exports = Org;
