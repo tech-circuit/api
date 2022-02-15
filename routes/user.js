@@ -151,7 +151,7 @@ router.delete("/delete", async (req, res) => {
 });
 
 router.get("/get", async (req, res) => {
-    let users = await User.find({});
+    let users = await User.find().sort({username: 1});
     res.json({ users: users });
 });
 
