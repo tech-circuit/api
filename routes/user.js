@@ -110,6 +110,11 @@ router.get("/pfp", async (req, res) => {
     }
 });
 
+router.get("/:id", async (req, res) => {
+    let user = await User.findOne({ _id: req.params.id });
+    res.json({user});
+})
+
 router.get("/info", async (req, res) => {
     const user = await User.findOne({ access_token: req.query.access_token });
     res.json({ user });
