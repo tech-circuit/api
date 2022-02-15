@@ -110,8 +110,8 @@ router.get("/pfp", async (req, res) => {
     }
 });
 
-router.get("/:id", async (req, res) => {
-    let user = await User.findOne({ _id: req.params.id });
+router.get("/id/:id", async (req, res) => {
+    let user = await User.findById(req.params.id);
     res.json({user});
 })
 
@@ -151,12 +151,8 @@ router.delete("/delete", async (req, res) => {
 });
 
 router.get("/get", async (req, res) => {
-    try {
-        const users = await User.find().sort({ username: 1 });
-        res.json({ users: users });
-    } catch (err) {
-        res.json({ err: err });
-    }
+    let users = await User.find({});
+    res.json({ users: users });
 });
 
 router.put("/user-details", async (req, res) => {

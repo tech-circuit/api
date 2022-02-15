@@ -5,6 +5,7 @@ const Org = require("../models/Org");
 
 router.get("/", async (req, res) => {
     let orgs = await Org.find();
+    console.log(orgs)
     res.json({ orgs });
 });
 
