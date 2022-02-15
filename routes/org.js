@@ -8,6 +8,11 @@ router.get("/", async (req, res) => {
     res.json({ orgs });
 });
 
+router.get("/:id", async (req, res) => {
+    let org = await Org.findOne({ _id: req.params.id });
+    res.json({org});
+})
+
 router.post("/add", async (req, res) => {
     const user = await User.findOne({ access_token: req.query.access_token });
 
