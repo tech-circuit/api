@@ -24,7 +24,7 @@ const server = app.listen(port, (err) => {
     if (err) throw err;
 });
 
-mongoose.connect(db, { useUnifiedTopology: true, useNewUrlParser: true })
+mongoose.connect(db, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true })
     .then(() => console.log('MongoDB Connected...'))
     .catch(err => console.log(err));
 mongoose.set('useFindAndModify', false);

@@ -32,7 +32,7 @@ const OrgSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
-    admin: {
+    admins: {
         type: Array,
         required: false, //change to true?
     },

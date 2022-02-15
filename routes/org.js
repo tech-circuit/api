@@ -9,7 +9,10 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/add", async (req, res) => {
-    const user = User.findOne({ access_token: req.query.access_token });
+    const user = await User.findOne({ access_token: req.query.access_token });
+
+    const admins = req.body.admins;
+    admins.push(user._id);
 
     try {
         let org = new Org({
@@ -22,7 +25,7 @@ router.post("/add", async (req, res) => {
             members: req.body.members,
             upload_date: new Date(),
             logo_url: req.body.logo_url,
-            admin: [user._id],
+            admins,
         });
 
         await org.save();

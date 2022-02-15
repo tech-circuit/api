@@ -147,7 +147,7 @@ router.delete("/delete", async (req, res) => {
 
 router.get("/get", async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find().sort({ username: 1 });
         res.json({ users: users });
     } catch (err) {
         res.json({ err: err });
