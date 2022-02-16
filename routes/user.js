@@ -111,9 +111,21 @@ router.get("/pfp", async (req, res) => {
 });
 
 router.get("/id/:id", async (req, res) => {
-    let user = await User.findById(req.params.id);
-    res.json({user});
-})
+    let user = await User.findById(req.params.id).select({
+        username: 1,
+        pfp_url: 1,
+        name: 1,
+        title: 1,
+        links: 1,
+        email: 1,
+        about: 1,
+        org: 1,
+        country: 1,
+        city: 1,
+        skills: 1,
+    });
+    res.json({ user });
+});
 
 router.get("/info", async (req, res) => {
     const user = await User.findOne({ access_token: req.query.access_token });
@@ -150,8 +162,10 @@ router.delete("/delete", async (req, res) => {
     }
 });
 
-router.get("/get", async (req, res) => {
-    let users = await User.find().sort({username: 1});
+router.get("/all", async (req, res) => {
+    let users = await User.find()
+        .select({ username: 1, pfp_url: 1, name: 1, title: 1, links: 1 })
+        .sort({ username: 1 });
     res.json({ users: users });
 });
 

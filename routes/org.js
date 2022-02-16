@@ -4,15 +4,14 @@ const User = require("../models/User");
 const Org = require("../models/Org");
 
 router.get("/", async (req, res) => {
-    let orgs = await Org.find();
-    console.log(orgs)
+    let orgs = await Org.find().sort({ createdAt: -1 });
     res.json({ orgs });
 });
 
 router.get("/:id", async (req, res) => {
     let org = await Org.findOne({ _id: req.params.id });
-    res.json({org});
-})
+    res.json({ org });
+});
 
 router.post("/add", async (req, res) => {
     const user = await User.findOne({ access_token: req.query.access_token });
@@ -29,7 +28,6 @@ router.post("/add", async (req, res) => {
             website_url: req.body.website_url,
             links: req.body.links,
             members: req.body.members,
-            upload_date: new Date(),
             logo_url: req.body.logo_url,
             admins,
         });
