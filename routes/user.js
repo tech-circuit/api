@@ -89,18 +89,6 @@ router.get("/discordauth/callback", async (req, res) => {
     }
 });
 
-router.get("/auth-pfp", async (req, res) => {
-    if (req.query.access_token !== "") {
-        let user = await User.findOne({ access_token: req.query.access_token });
-        if (user) {
-            res.json({ pfp: user.pfp_url });
-        } else {
-            res.json({ pfp: false });
-        }
-    } else {
-        res.json({ pfp: false });
-    }
-});
 router.get("/pfp", async (req, res) => {
     let user = await User.findOne({ access_token: req.query.access_token });
     if (user) {
@@ -128,7 +116,21 @@ router.get("/id/:id", async (req, res) => {
 });
 
 router.get("/info", async (req, res) => {
-    const user = await User.findOne({ access_token: req.query.access_token });
+    const user = await User.findOne({
+        access_token: req.query.access_token,
+    }).select({
+        username: 1,
+        pfp_url: 1,
+        name: 1,
+        title: 1,
+        links: 1,
+        email: 1,
+        about: 1,
+        org: 1,
+        country: 1,
+        city: 1,
+        skills: 1,
+    });
     res.json({ user });
 });
 
