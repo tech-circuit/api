@@ -67,8 +67,18 @@ router.put("/edit/:id", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-    const project = await Project.findById(req.params.id);
-    res.json({ project });
+    try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        const project = await Project.findOne({
+            _id: req.params.id,
+            uploader: user.username,
+        });
+        res.json({ project });
+    } catch (err) {
+        res.json({ err });
+    }
 });
 
 module.exports = router;
