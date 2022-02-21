@@ -4,19 +4,34 @@ const Project = require("../models/Project");
 const User = require("../models/User");
 // const fields = require('../data/fields')
 
+router.get("/", async (req, res) => {
+    const projects = await Project.find();
+    res.json({ projects });
+});
+
 router.post("/add", async (req, res) => {
     const user = await User.findOne({ access_token: req.query.access_token });
+    const {
+        title,
+        cover_image,
+        description,
+        fields,
+        links,
+        tags,
+        event,
+        collaborators,
+    } = req.body;
     try {
         let project = new Project({
-            title: req.body.title,
-            cover_image: req.body.cover_image,
-            authors: req.body.authors,
-            description: req.body.description,
-            fields: req.body.fields,
-            links: req.body.links,
+            title,
+            cover_image,
+            description,
+            fields,
+            links,
             uploader: user.username,
-            tags: req.body.tags,
-            event: req.body.event,
+            tags,
+            event,
+            collaborators,
         });
         // project.fields.forEach(field => {
         //     if (fields.design[field]) {
@@ -34,6 +49,26 @@ router.post("/add", async (req, res) => {
     } catch (err) {
         res.json({ err });
     }
+});
+
+router.put("/edit/:id", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        await Project.updateOne(
+            { _id: req.params.id, uploader: user.username },
+            { $set: req.body }
+        );
+        res.json({ done: true });
+    } catch (err) {
+        res.json({ err });
+    }
+});
+
+router.get("/:id", async (req, res) => {
+    const project = await Project.findById(req.params.id);
+    res.json({ project });
 });
 
 module.exports = router;
