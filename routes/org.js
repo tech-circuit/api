@@ -9,21 +9,34 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/add", async (req, res) => {
-    const user = await User.findOne({ access_token: req.query.access_token });
-
-    const admins = req.body.admins;
-    admins.push(user._id);
-
     try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+
+        const {
+            name,
+            institute,
+            isIndependant,
+            description,
+            website_url,
+            links,
+            members,
+            logo_url,
+            admins,
+        } = req.body;
+
+        admins.push(user._id);
+
         let org = new Org({
-            name: req.body.name,
-            institute: req.body.institute,
-            isIndependant: req.body.isIndependant,
-            description: req.body.description,
-            website_url: req.body.website_url,
-            links: req.body.links,
-            members: req.body.members,
-            logo_url: req.body.logo_url,
+            name,
+            institute,
+            isIndependant,
+            description,
+            website_url,
+            links,
+            members,
+            logo_url,
             admins,
         });
 

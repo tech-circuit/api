@@ -119,6 +119,7 @@ router.get("/info", async (req, res) => {
     const user = await User.findOne({
         access_token: req.query.access_token,
     }).select({
+        _id: 1,
         username: 1,
         pfp_url: 1,
         name: 1,

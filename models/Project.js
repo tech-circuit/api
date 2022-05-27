@@ -38,6 +38,10 @@ const ProjectSchema = new mongoose.Schema(
             type: String,
             required: false,
         },
+        commentsEnabled: {
+            type: Boolean,
+            required: true,
+        },
         upvotes: {
             type: Number,
             default: 0,

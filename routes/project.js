@@ -20,6 +20,7 @@ router.post("/add", async (req, res) => {
         tags,
         event,
         collaborators,
+        commentsEnabled,
     } = req.body;
     try {
         let project = new Project({
@@ -28,10 +29,11 @@ router.post("/add", async (req, res) => {
             description,
             fields,
             links,
-            uploader: user.username,
+            uploader: user._id,
             tags,
             event,
             collaborators,
+            commentsEnabled,
         });
         // project.fields.forEach(field => {
         //     if (fields.design[field]) {
@@ -57,7 +59,7 @@ router.put("/edit/:id", async (req, res) => {
             access_token: req.query.access_token,
         });
         await Project.updateOne(
-            { _id: req.params.id, uploader: user.username },
+            { _id: req.params.id, uploader: user._id },
             { $set: req.body }
         );
         res.json({ done: true });
@@ -68,14 +70,37 @@ router.put("/edit/:id", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
     try {
+        const project = await Project.findOne({
+            _id: req.params.id,
+        });
+        res.json({ project });
+    } catch (err) {
+        res.json({ err });
+    }
+});
+
+router.get("/getForEdit/:id", async (req, res) => {
+    try {
         const user = await User.findOne({
             access_token: req.query.access_token,
         });
         const project = await Project.findOne({
             _id: req.params.id,
-            uploader: user.username,
+            uploader: user._id.toString(),
         });
         res.json({ project });
+    } catch (err) {
+        res.json({ err });
+    }
+});
+
+router.delete("/delete/:id", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        await Project.deleteOne({ _id: req.params.id, uploader: user._id });
+        res.json({ done: true });
     } catch (err) {
         res.json({ err });
     }
