@@ -36,13 +36,7 @@ app.set('view engine', 'ejs');
 app.use(express.json({ limit: '50mb', extended: true }));
 app.use(express.urlencoded({ limit: '50mb', extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(
-    cors({
-        origin: "*",
-        credentials: true,
-        optionSuccessStatus: 200,
-    })
-);
+app.use(cors());
 
 app.use('/', indexRouter);
 app.use('/user', userRouter);

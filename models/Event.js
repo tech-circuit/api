@@ -51,7 +51,6 @@ const EventSchema = new mongoose.Schema({
     },
     links: {
         type: Object,
-        required: false,
     },
     email: {
         type: String,
