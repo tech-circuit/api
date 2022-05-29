@@ -25,7 +25,7 @@ const OrgSchema = new mongoose.Schema(
         institute: {
             type: String,
         },
-        isIndependant: {
+        isIndependent: {
             type: Boolean,
             required: true, //change to true
         },

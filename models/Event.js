@@ -16,7 +16,7 @@ const EventSchema = new mongoose.Schema({
     institute: {
         type: String,
     },
-    isIndependant: {
+    isIndependent: {
         type: Boolean,
         required: true,
     },

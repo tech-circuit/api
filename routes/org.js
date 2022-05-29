@@ -17,7 +17,7 @@ router.post("/add", async (req, res) => {
         const {
             name,
             institute,
-            isIndependant,
+            isIndependent,
             description,
             website_url,
             links,
@@ -31,7 +31,7 @@ router.post("/add", async (req, res) => {
         let org = new Org({
             name,
             institute,
-            isIndependant,
+            isIndependent,
             description,
             website_url,
             links,
