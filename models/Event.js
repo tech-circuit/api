@@ -62,6 +62,7 @@ const EventSchema = new mongoose.Schema({
     },
     country: {
         type: String,
+        required: true,
     },
     state: {
         type: String,

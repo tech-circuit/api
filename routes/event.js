@@ -32,6 +32,8 @@ router.post("/add", async (req, res) => {
             tags,
             institute,
             fields,
+            country,
+            state,
         } = req.body;
 
         let event = new Event({
@@ -54,6 +56,8 @@ router.post("/add", async (req, res) => {
             tags,
             institute,
             fields,
+            country,
+            state,
         });
         await event.save();
         res.json({ done: true });
