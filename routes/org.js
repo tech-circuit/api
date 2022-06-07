@@ -24,9 +24,10 @@ router.post("/add", async (req, res) => {
             members,
             logo_url,
             admins,
+            alumni,
         } = req.body;
 
-        admins.push(user._id);
+        admins.push(user._id.toString());
 
         let org = new Org({
             name,
@@ -38,6 +39,7 @@ router.post("/add", async (req, res) => {
             members,
             logo_url,
             admins,
+            alumni,
         });
 
         await org.save();
@@ -50,6 +52,49 @@ router.post("/add", async (req, res) => {
 router.get("/id/:id", async (req, res) => {
     let org = await Org.findOne({ _id: req.params.id });
     res.json({ org });
+});
+
+router.get("/getForEdit/:id", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        const org = await Org.findOne({
+            _id: req.params.id,
+        });
+
+        for (let admin of org.admins) {
+            if (admin.toString() == user._id.toString()) {
+                res.json({ org });
+            } else {
+                res.json({ err: "User mismatch" });
+            }
+        }
+    } catch (err) {
+        res.json({ err });
+    }
+});
+
+router.delete("/delete/:id", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        const org = await Org.findOne({
+            _id: req.params.id,
+        });
+
+        for (let admin of org.admins) {
+            if (admin.toString() == user._id.toString()) {
+                await Org.deleteOne({ _id: req.params.id });
+                res.json({ done: true });
+            } else {
+                res.json({ err: "User mismatch" });
+            }
+        }
+    } catch (err) {
+        res.json({ err });
+    }
 });
 
 router.post("/req/:id", async (req, res) => {

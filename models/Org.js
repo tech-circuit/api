@@ -8,7 +8,7 @@ const OrgSchema = new mongoose.Schema(
         },
         members: {
             type: Array,
-            required: false, //change to true?
+            required: false,
         },
         name: {
             type: String,
@@ -20,14 +20,14 @@ const OrgSchema = new mongoose.Schema(
         },
         website_url: {
             type: String,
-            required: false, //change to true // nhi bhai nhi
+            required: false,
         },
         institute: {
             type: String,
         },
         isIndependent: {
             type: Boolean,
-            required: true, //change to true
+            required: true,
         },
         logo_url: {
             type: String,
@@ -35,7 +35,7 @@ const OrgSchema = new mongoose.Schema(
         },
         admins: {
             type: Array,
-            required: false, //change to true?
+            required: true,
         },
         links: {
             type: Array,

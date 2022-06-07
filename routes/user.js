@@ -99,6 +99,7 @@ router.get("/pfp", async (req, res) => {
 });
 
 router.get("/id/:id", async (req, res) => {
+    console.log(req.params.id);
     let user = await User.findById(req.params.id).select({
         username: 1,
         pfp_url: 1,
@@ -111,6 +112,7 @@ router.get("/id/:id", async (req, res) => {
         country: 1,
         city: 1,
         skills: 1,
+        _id: 1,
     });
     res.json({ user });
 });
@@ -167,8 +169,14 @@ router.delete("/delete", async (req, res) => {
 
 router.get("/all", async (req, res) => {
     let users = await User.find()
-        .select({ username: 1, pfp_url: 1, name: 1, title: 1, links: 1 })
-        .sort({ username: 1 });
+        .select({
+            pfp_url: 1,
+            name: 1,
+            title: 1,
+            links: 1,
+            _id: 1,
+        })
+        .sort({ name: 1 });
     res.json({ users: users });
 });
 
