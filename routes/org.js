@@ -62,16 +62,17 @@ router.get("/getForEdit/:id", async (req, res) => {
         const org = await Org.findOne({
             _id: req.params.id,
         });
+        const verified = org.admins.find(
+            (admin) => admin.toString() === user._id.toString()
+        );
 
-        for (let admin of org.admins) {
-            if (admin.toString() == user._id.toString()) {
-                res.json({ org });
-            } else {
-                res.json({ err: "User mismatch" });
-            }
+        if (verified) {
+            return res.json({ org });
+        } else {
+            return res.json({ err: "User mismatch" });
         }
     } catch (err) {
-        res.json({ err });
+        return res.json({ err });
     }
 });
 
@@ -84,13 +85,42 @@ router.delete("/delete/:id", async (req, res) => {
             _id: req.params.id,
         });
 
-        for (let admin of org.admins) {
-            if (admin.toString() == user._id.toString()) {
-                await Org.deleteOne({ _id: req.params.id });
-                res.json({ done: true });
-            } else {
-                res.json({ err: "User mismatch" });
-            }
+        const verified = org.admins.find(
+            (admin) => admin.toString() === user._id.toString()
+        );
+
+        if (verified) {
+            await Org.deleteOne({ _id: req.params.id });
+            return res.json({ done: true });
+        } else {
+            return res.json({ err: "User mismatch" });
+        }
+    } catch (err) {
+        return res.json({ err });
+    }
+});
+
+router.put("/edit/:id", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        const org = await Org.findOne({
+            _id: req.params.id,
+        });
+        const verified = org.admins.find(
+            (admin) => admin.toString() === user._id.toString()
+        );
+
+        if (verified) {
+            const adminPresent = req.body.admins.find(
+                (admin) => admin.toString() === user._id.toString()
+            );
+
+            !adminPresent && req.body.admins.push(user._id.toString());
+
+            await Org.updateOne({ _id: req.params.id }, { $set: req.body });
+            return res.json({ done: true });
         }
     } catch (err) {
         res.json({ err });
