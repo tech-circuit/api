@@ -24,16 +24,18 @@ router.post("/gauth", async (req, res) => {
                     pfp_url: req.body.imageUrl,
                     access_token: req.body.access_token,
                     username: username,
+                    setUp: false,
                 });
-                newUser.save();
+                await newUser.save();
+                return res.json({ user: newUser });
             } else {
                 if (req.body.access_token != user.access_token) {
                     user.access_token = req.body.access_token;
                     await user.save();
+                    return res.json({ user });
                 }
             }
         });
-        res.sendStatus(200);
     } catch (err) {
         console.log(err);
     }
@@ -133,6 +135,7 @@ router.get("/info", async (req, res) => {
         country: 1,
         city: 1,
         skills: 1,
+        setUp: 1,
     });
     res.json({ user });
 });
@@ -144,6 +147,7 @@ router.post("/update", async (req, res) => {
             $set: req.body,
         }
     );
+    res.json({ done: true });
 });
 
 router.delete("/delete", async (req, res) => {

@@ -72,6 +72,10 @@ const UserSchema = new mongoose.Schema({
     saves: {
         type: Array,
         default: []
+    },
+    setUp: {
+        type: Boolean,
+        required: false
     }
 })
 
