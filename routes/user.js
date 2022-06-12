@@ -141,13 +141,17 @@ router.get("/info", async (req, res) => {
 });
 
 router.post("/update", async (req, res) => {
-    await User.updateOne(
-        { access_token: req.query.access_token },
-        {
-            $set: req.body,
-        }
-    );
-    res.json({ done: true });
+    try {
+        await User.updateOne(
+            { access_token: req.query.access_token },
+            {
+                $set: req.body,
+            }
+        );
+        res.json({ done: true });
+    } catch (err) {
+        res.json({ error: err, done: false });
+    }
 });
 
 router.delete("/delete", async (req, res) => {
