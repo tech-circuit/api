@@ -68,17 +68,6 @@ router.put("/edit/:id", async (req, res) => {
     }
 });
 
-router.get("/:id", async (req, res) => {
-    try {
-        const project = await Project.findOne({
-            _id: req.params.id,
-        });
-        res.json({ project });
-    } catch (err) {
-        res.json({ err });
-    }
-});
-
 router.get("/getForEdit/:id", async (req, res) => {
     try {
         const user = await User.findOne({
@@ -101,6 +90,28 @@ router.delete("/delete/:id", async (req, res) => {
         });
         await Project.deleteOne({ _id: req.params.id, uploader: user._id });
         res.json({ done: true });
+    } catch (err) {
+        res.json({ err });
+    }
+});
+
+router.post("/search", async (req, res) => {
+    try {
+        const projects = await Project.find({
+            $text: { $search: req.body.search },
+        });
+        return res.json({ projects });
+    } catch (err) {
+        return res.json({ err });
+    }
+});
+
+router.get("/:id", async (req, res) => {
+    try {
+        const project = await Project.findOne({
+            _id: req.params.id,
+        });
+        res.json({ project });
     } catch (err) {
         res.json({ err });
     }
