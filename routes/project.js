@@ -106,6 +106,15 @@ router.post("/search", async (req, res) => {
     }
 });
 
+router.post("/field", async (req, res) => {
+    try {
+        const projects = await Project.find({ fields: req.body.field });
+        return res.json({ projects });
+    } catch (err) {
+        res.json({ err });
+    }
+});
+
 router.get("/:id", async (req, res) => {
     try {
         const project = await Project.findOne({

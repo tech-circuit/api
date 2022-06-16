@@ -19,7 +19,7 @@ const ProjectSchema = new mongoose.Schema(
             required: true,
         },
         fields: {
-            type: Array,
+            type: [String],
             required: false,
         },
         links: {
