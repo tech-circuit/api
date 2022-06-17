@@ -154,6 +154,17 @@ router.post("/update", async (req, res) => {
     }
 });
 
+router.post("/search", async (req, res) => {
+    try {
+        const users = await User.find({
+            $text: { $search: req.body.search },
+        });
+        return res.json({ data: users });
+    } catch (err) {
+        return res.json({ err });
+    }
+});
+
 router.delete("/delete", async (req, res) => {
     try {
         const user = await User.findOne({

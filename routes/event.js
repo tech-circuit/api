@@ -4,7 +4,7 @@ const User = require("../models/User");
 const Event = require("../models/Event");
 
 router.get("/", async (req, res) => {
-    let events = await Event.find();
+    let events = await Event.find().sort({ createdAt: -1 });
     res.json({ events });
 });
 
@@ -92,6 +92,26 @@ router.put("/edit/:id", async (req, res) => {
             { $set: req.body }
         );
         res.json({ done: true });
+    } catch (err) {
+        res.json({ err });
+    }
+});
+
+router.post("/search", async (req, res) => {
+    try {
+        const events = await Event.find({
+            $text: { $search: req.body.search },
+        });
+        return res.json({ events });
+    } catch (err) {
+        return res.json({ err });
+    }
+});
+
+router.post("/field", async (req, res) => {
+    try {
+        const events = await Event.find({ fields: req.body.field });
+        return res.json({ events });
     } catch (err) {
         res.json({ err });
     }

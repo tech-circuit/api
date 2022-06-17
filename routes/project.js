@@ -5,7 +5,7 @@ const User = require("../models/User");
 // const fields = require('../data/fields')
 
 router.get("/", async (req, res) => {
-    const projects = await Project.find();
+    const projects = await Project.find().sort({ createdAt: -1 });
     res.json({ projects });
 });
 

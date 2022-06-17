@@ -76,6 +76,17 @@ router.get("/getForEdit/:id", async (req, res) => {
     }
 });
 
+router.post("/search", async (req, res) => {
+    try {
+        const orgs = await Org.find({
+            $text: { $search: req.body.search },
+        });
+        return res.json({ data: orgs });
+    } catch (err) {
+        return res.json({ err });
+    }
+});
+
 router.delete("/delete/:id", async (req, res) => {
     try {
         const user = await User.findOne({
