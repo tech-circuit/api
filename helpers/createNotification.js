@@ -7,7 +7,7 @@ const Event = require("../models/Event");
 
 function truncateText(text) {
     if (text.length > 19) {
-        return text.substring(0, 16) + "..."
+        return text.substring(0, 19) + "..."
     } else {
         return text
     }
