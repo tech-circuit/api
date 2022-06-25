@@ -260,9 +260,9 @@ router.post('/comment/new', async(req, res) => {
             }
         })
         await comment.save()
-        let bool = await createNotification(user._id, 'comment', {type: "post", typeID: req.body.post_id})
-        if (bool) {
-            res.json({ success: true })
+        let { status, receivers } = await createNotification(user._id, 'comment', {type: "post", typeID: req.body.post_id})
+        if (status) {
+            res.json({ success: true, receivers: receivers })
         } else {
             res.json({ success: false, error: 'Could not create notification.' })
         }

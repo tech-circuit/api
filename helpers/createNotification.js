@@ -55,7 +55,7 @@ function createNotification(sender, type, typeDetails) {
             notifs.push(notif)
         }
         let bool = await Notification.insertMany(notifs)
-        resolve(bool) // set bool to status of adding to db (true or false)
+        resolve({ status: bool, receivers: receivers }) // set bool to status of adding to db (true or false)
     })
     return promise
 }
