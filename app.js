@@ -56,6 +56,7 @@ app.use('/notifs', notifs);
 
 io.on('connection', socket=>{
     socket.on('notif', receivers => {
+        console.log(receivers)
         receivers.forEach(id => {
             socket.emit('notif', id)
         })
