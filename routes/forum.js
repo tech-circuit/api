@@ -8,6 +8,7 @@ const createDOMPurify = require('dompurify');
 const { JSDOM } = require('jsdom');
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
+const createNotification = require('../helpers/createNotification')
 
 router.get('/', async(req, res) => {
     if (req.query.page) {
@@ -259,7 +260,12 @@ router.post('/comment/new', async(req, res) => {
             }
         })
         await comment.save()
-        res.json({ success: true })
+        let bool = await createNotification(user._id, 'comment', {type: "post", typeID: req.body.post_id})
+        if (bool) {
+            res.json({ success: true })
+        } else {
+            res.json({ success: false, error: 'Could not create notification.' })
+        }
     } else {
         res.json({ success: false, error: 'User not found.' })
     }

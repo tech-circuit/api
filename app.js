@@ -13,6 +13,7 @@ const forumRouter = require('./routes/forum');
 const mailingListRouter = require('./routes/mailingList');
 const orgRouter = require('./routes/org');
 const orgEvent = require('./routes/event');
+const notifs = require('./routes/notifs');
 
 const db = process.env.MONGODB_URL;
 
@@ -47,5 +48,6 @@ app.use('/forum', forumRouter);
 app.use('/ml', mailingListRouter);
 app.use('/org', orgRouter);
 app.use('/event', orgEvent);
+app.use('/notifs', notifs);
 
 module.exports = app;
