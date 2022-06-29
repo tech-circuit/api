@@ -10,10 +10,10 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
     try {
-        const project = await Project.findOne({
+        const event = await Event.findOne({
             _id: req.params.id,
         });
-        res.json({ project });
+        res.json({ event });
     } catch (err) {
         res.json({ err });
     }
