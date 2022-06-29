@@ -8,6 +8,17 @@ router.get("/", async (req, res) => {
     res.json({ events });
 });
 
+router.get("/:id", async (req, res) => {
+    try {
+        const project = await Project.findOne({
+            _id: req.params.id,
+        });
+        res.json({ project });
+    } catch (err) {
+        res.json({ err });
+    }
+});
+
 router.post("/add", async (req, res) => {
     try {
         const user = await User.findOne({
