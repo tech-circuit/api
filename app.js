@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const cors = require('cors');
+const socketIO = require("socket.io");
+
 require('dotenv').config();
 
 const indexRouter = require('./routes/index');
@@ -13,6 +15,7 @@ const forumRouter = require('./routes/forum');
 const mailingListRouter = require('./routes/mailingList');
 const orgRouter = require('./routes/org');
 const orgEvent = require('./routes/event');
+const notifs = require('./routes/notifs');
 
 const db = process.env.MONGODB_URL;
 
@@ -23,6 +26,8 @@ const server = app.listen(port, (err) => {
     console.log(`API listening on ${port}!`);
     if (err) throw err;
 });
+
+const io = socketIO(server, { cors: true, origins: '*:*' });
 
 mongoose.connect(db, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true })
     .then(() => console.log('MongoDB Connected...'))
@@ -47,5 +52,15 @@ app.use('/forum', forumRouter);
 app.use('/ml', mailingListRouter);
 app.use('/org', orgRouter);
 app.use('/event', orgEvent);
+app.use('/notifs', notifs);
+
+io.on('connection', socket=>{
+    socket.on('notif', receivers => {
+        console.log(receivers)
+        receivers.forEach(id => {
+            io.emit('notif', id)
+        })
+    })
+})
 
 module.exports = app;
