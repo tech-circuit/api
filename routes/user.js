@@ -165,6 +165,25 @@ router.post("/search", async (req, res) => {
     }
 });
 
+router.put("/pfp", async (req, res) => {
+    try {
+        await User.updateOne(
+            { access_token: req.query.access_token },
+            {
+                $set: {
+                    pfp_url: req.body.pfp,
+                },
+            }
+        );
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        return res.json({ user });
+    } catch (err) {
+        return res.json({ err });
+    }
+});
+
 router.delete("/delete", async (req, res) => {
     try {
         const user = await User.findOne({
@@ -183,6 +202,25 @@ router.delete("/delete", async (req, res) => {
         }
     } catch (err) {
         res.json({ err: err });
+    }
+});
+
+router.delete("/pfp", async (req, res) => {
+    try {
+        await User.updateOne(
+            { access_token: req.query.access_token },
+            {
+                $set: {
+                    pfp_url: "/assets/userFlowIcon.svg",
+                },
+            }
+        );
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        return res.json({ user });
+    } catch (err) {
+        return res.json({ err });
     }
 });
 
