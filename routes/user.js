@@ -101,21 +101,22 @@ router.get("/pfp", async(req, res) => {
 router.get("/id/:id", async(req, res) => {
     let user = await User.findById(req.params.id);
     if (user) {
-        user.select({
-            username: 1,
-            pfp_url: 1,
-            name: 1,
-            title: 1,
-            links: 1,
-            email: 1,
-            about: 1,
-            org: 1,
-            country: 1,
-            city: 1,
-            skills: 1,
-            _id: 1,
+        res.json({
+            user: {
+                username: user.username,
+                pfp_url: user.pfp_url,
+                name: user.name,
+                title: user.title,
+                links: user.links,
+                email: user.email,
+                about: user.about,
+                org: user.org,
+                country: user.country,
+                city: user.city,
+                skills: user.skills,
+                _id: user._id
+            }
         });
-        res.json({ user });
     } else {
         res.json({ success: false, error: "User not found." })
     }
