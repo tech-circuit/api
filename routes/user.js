@@ -8,9 +8,9 @@ const Post = require("../models/Post");
 
 const DISCORD_CLIENT_ID = "830041863247495168";
 
-router.post("/gauth", async (req, res) => {
+router.post("/gauth", async(req, res) => {
     try {
-        User.findOne({ google_id: req.body.googleId }).then(async (user) => {
+        User.findOne({ google_id: req.body.googleId }).then(async(user) => {
             if (!user) {
                 let username = req.body.email.split("@")[0];
                 req.body.imageUrl = req.body.imageUrl.slice(0, -4);
@@ -45,15 +45,14 @@ router.get("/discordauth", (req, res) => {
     );
 });
 
-router.get("/discordauth/callback", async (req, res) => {
+router.get("/discordauth/callback", async(req, res) => {
     try {
         const code = req.query.code;
         const access_token = req.query.state;
         let response = await axios
             .post(
                 "https://discord.com/api/oauth2/token",
-                `client_id=${DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&grant_type=authorization_code&code=${code}&redirect_uri=${process.env.BASE_URL}/user/discordauth/callback&scopes=identify`,
-                {
+                `client_id=${DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&grant_type=authorization_code&code=${code}&redirect_uri=${process.env.BASE_URL}/user/discordauth/callback&scopes=identify`, {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
@@ -62,12 +61,11 @@ router.get("/discordauth/callback", async (req, res) => {
             .catch((err) => {
                 console.log(err);
             });
-        User.findOne({ access_token: access_token }).then(async (user) => {
+        User.findOne({ access_token: access_token }).then(async(user) => {
             if (user) {
                 user.discord_auth = response.data;
                 let discord_user = await axios.get(
-                    "https://discord.com/api/users/@me",
-                    {
+                    "https://discord.com/api/users/@me", {
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded",
                             Authorization: `Bearer ${response.data.access_token}`,
@@ -89,7 +87,7 @@ router.get("/discordauth/callback", async (req, res) => {
     }
 });
 
-router.get("/auth-pfp", async (req, res) => {
+router.get("/auth-pfp", async(req, res) => {
     if (req.query.access_token !== "") {
         let user = await User.findOne({ access_token: req.query.access_token });
         if (user) {
@@ -101,7 +99,7 @@ router.get("/auth-pfp", async (req, res) => {
         res.json({ pfp: false });
     }
 });
-router.get("/pfp", async (req, res) => {
+router.get("/pfp", async(req, res) => {
     let user = await User.findOne({ access_token: req.query.access_token });
     if (user) {
         res.redirect(user.pfp_url);
@@ -110,38 +108,40 @@ router.get("/pfp", async (req, res) => {
     }
 });
 
-router.get("/id/:id", async (req, res) => {
-    let user = await User.findById(req.params.id).select({
-        username: 1,
-        pfp_url: 1,
-        name: 1,
-        title: 1,
-        links: 1,
-        email: 1,
-        about: 1,
-        org: 1,
-        country: 1,
-        city: 1,
-        skills: 1,
-    });
-    res.json({ user });
+router.get("/id/:id", async(req, res) => {
+    let user = await User.findById(req.params.id);
+    if (user) {
+        user.select({
+            username: 1,
+            pfp_url: 1,
+            name: 1,
+            title: 1,
+            links: 1,
+            email: 1,
+            about: 1,
+            org: 1,
+            country: 1,
+            city: 1,
+            skills: 1,
+        });
+        res.json({ user });
+    } else {
+        res.json({ success: false, error: 'User not found.' })
+    }
 });
 
-router.get("/info", async (req, res) => {
+router.get("/info", async(req, res) => {
     const user = await User.findOne({ access_token: req.query.access_token });
     res.json({ user });
 });
 
-router.post("/update", async (req, res) => {
-    await User.updateOne(
-        { access_token: req.query.access_token },
-        {
-            $set: req.body,
-        }
-    );
+router.post("/update", async(req, res) => {
+    await User.updateOne({ access_token: req.query.access_token }, {
+        $set: req.body,
+    });
 });
 
-router.delete("/delete", async (req, res) => {
+router.delete("/delete", async(req, res) => {
     try {
         const user = await User.findOne({
             access_token: req.query.access_token,
@@ -162,37 +162,34 @@ router.delete("/delete", async (req, res) => {
     }
 });
 
-router.get("/all", async (req, res) => {
+router.get("/all", async(req, res) => {
     let users = await User.find()
         .select({ username: 1, pfp_url: 1, name: 1, title: 1, links: 1 })
         .sort({ username: 1 });
     res.json({ users: users });
 });
 
-router.put("/user-details", async (req, res) => {
+router.put("/user-details", async(req, res) => {
     try {
         const { username, about, org, title, country, city, skills, links } =
-            req.body;
+        req.body;
         const user = await User.findOne({
             access_token: req.query.access_token,
         });
 
         if (user) {
-            await User.updateOne(
-                { access_token: req.query.access_token },
-                {
-                    $set: {
-                        username: username ? username : "",
-                        about: about ? about : "",
-                        org: org ? org : "",
-                        title: title ? title : "",
-                        country: country ? country : "",
-                        city: city ? city : "",
-                        skills: skills ? skills : "",
-                        links: links ? links : "",
-                    },
-                }
-            );
+            await User.updateOne({ access_token: req.query.access_token }, {
+                $set: {
+                    username: username ? username : "",
+                    about: about ? about : "",
+                    org: org ? org : "",
+                    title: title ? title : "",
+                    country: country ? country : "",
+                    city: city ? city : "",
+                    skills: skills ? skills : "",
+                    links: links ? links : "",
+                },
+            });
 
             res.json({ done: true });
         } else {
