@@ -99,7 +99,7 @@ router.get("/pfp", async(req, res) => {
 });
 
 router.get("/id/:id", async(req, res) => {
-    let user = await User.findById(req.params.id);
+    let user = await User.findOne({ _id: req.params.id });
     if (user) {
         res.json({
             user: {
