@@ -24,16 +24,18 @@ router.post("/gauth", async(req, res) => {
                     pfp_url: req.body.imageUrl,
                     access_token: req.body.access_token,
                     username: username,
+                    setUp: false,
                 });
-                newUser.save();
+                await newUser.save();
+                return res.json({ user: newUser });
             } else {
                 if (req.body.access_token != user.access_token) {
                     user.access_token = req.body.access_token;
                     await user.save();
+                    return res.json({ user });
                 }
             }
         });
-        res.sendStatus(200);
     } catch (err) {
         console.log(err);
     }
@@ -87,18 +89,6 @@ router.get("/discordauth/callback", async(req, res) => {
     }
 });
 
-router.get("/auth-pfp", async(req, res) => {
-    if (req.query.access_token !== "") {
-        let user = await User.findOne({ access_token: req.query.access_token });
-        if (user) {
-            res.json({ pfp: user.pfp_url });
-        } else {
-            res.json({ pfp: false });
-        }
-    } else {
-        res.json({ pfp: false });
-    }
-});
 router.get("/pfp", async(req, res) => {
     let user = await User.findOne({ access_token: req.query.access_token });
     if (user) {
@@ -123,22 +113,71 @@ router.get("/id/:id", async(req, res) => {
             country: 1,
             city: 1,
             skills: 1,
+            _id: 1,
         });
         res.json({ user });
     } else {
-        res.json({ success: false, error: 'User not found.' })
+        res.json({ success: true, error: "User not found." })
     }
 });
 
 router.get("/info", async(req, res) => {
-    const user = await User.findOne({ access_token: req.query.access_token });
+    const user = await User.findOne({
+        access_token: req.query.access_token,
+    }).select({
+        _id: 1,
+        username: 1,
+        pfp_url: 1,
+        name: 1,
+        title: 1,
+        links: 1,
+        email: 1,
+        about: 1,
+        org: 1,
+        country: 1,
+        city: 1,
+        skills: 1,
+        setUp: 1,
+    });
     res.json({ user });
 });
 
 router.post("/update", async(req, res) => {
-    await User.updateOne({ access_token: req.query.access_token }, {
-        $set: req.body,
-    });
+    try {
+        await User.updateOne({ access_token: req.query.access_token }, {
+            $set: req.body,
+        });
+        res.json({ done: true });
+    } catch (err) {
+        res.json({ error: err, done: false });
+    }
+});
+
+router.post("/search", async(req, res) => {
+    try {
+        const users = await User.find({
+            $text: { $search: req.body.search },
+        });
+        return res.json({ data: users });
+    } catch (err) {
+        return res.json({ err });
+    }
+});
+
+router.put("/pfp", async(req, res) => {
+    try {
+        await User.updateOne({ access_token: req.query.access_token }, {
+            $set: {
+                pfp_url: req.body.pfp,
+            },
+        });
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        return res.json({ user });
+    } catch (err) {
+        return res.json({ err });
+    }
 });
 
 router.delete("/delete", async(req, res) => {
@@ -162,42 +201,33 @@ router.delete("/delete", async(req, res) => {
     }
 });
 
-router.get("/all", async(req, res) => {
-    let users = await User.find()
-        .select({ username: 1, pfp_url: 1, name: 1, title: 1, links: 1 })
-        .sort({ username: 1 });
-    res.json({ users: users });
-});
-
-router.put("/user-details", async(req, res) => {
+router.delete("/pfp", async(req, res) => {
     try {
-        const { username, about, org, title, country, city, skills, links } =
-        req.body;
+        await User.updateOne({ access_token: req.query.access_token }, {
+            $set: {
+                pfp_url: "/assets/userFlowIcon.svg",
+            },
+        });
         const user = await User.findOne({
             access_token: req.query.access_token,
         });
-
-        if (user) {
-            await User.updateOne({ access_token: req.query.access_token }, {
-                $set: {
-                    username: username ? username : "",
-                    about: about ? about : "",
-                    org: org ? org : "",
-                    title: title ? title : "",
-                    country: country ? country : "",
-                    city: city ? city : "",
-                    skills: skills ? skills : "",
-                    links: links ? links : "",
-                },
-            });
-
-            res.json({ done: true });
-        } else {
-            res.json({ err: "User not found" });
-        }
+        return res.json({ user });
     } catch (err) {
-        res.json({ err: err });
+        return res.json({ err });
     }
+});
+
+router.get("/all", async(req, res) => {
+    let users = await User.find()
+        .select({
+            pfp_url: 1,
+            name: 1,
+            title: 1,
+            links: 1,
+            _id: 1,
+        })
+        .sort({ name: 1 });
+    res.json({ users: users });
 });
 
 module.exports = router;

@@ -1,44 +1,142 @@
-const express = require('express')
-const router = express.Router()
-const User = require('../models/User')
-const Event = require('../models/Event')
+const express = require("express");
+const router = express.Router();
+const User = require("../models/User");
+const Event = require("../models/Event");
 
-router.get("/", async (req, res)=> {
-    let events = await Event.find();
-    res.send("events")
-    // res.json(events);
-})
+router.get("/", async (req, res) => {
+    let events = await Event.find().sort({ createdAt: -1 });
+    res.json({ events });
+});
 
-router.post('/add', (req, res) => {
-    const user = User.findOne({ access_token: req.query.access_token })
+router.get("/:id", async (req, res) => {
     try {
-        let event = new Event({
-            name: req.body.name,
-            author: req.body.author,
-            organisers: req.body.organisers,
-            description: req.body.description,
-            reg_last_date: req.body.reg_last_date,
-            links: req.body.links,
-            hosting_method: req.body.hosting_method,
-            eligibility: req.body.eligibility,
-            event_start_date: req.body.event_start_date,
-            event_end_date: req.body.event_end_date,
-            event_start_time: req.body.event_start_time,            
-            event_end_time: req.body.event_end_time,            
-            country: req.body.country,
-            state: req.body.state,
-            org: req.body.org,
-            isIndependant: req.body.isIndependant,
-            website: req.body.website,
-            links: req.body.links,
-            banner: req.body.banner,
-            upload_date: new Date(),
-            tags: req.body.tags,
-            for_event: req.body.for_event
-        })
-        event.save()
+        const event = await Event.findOne({
+            _id: req.params.id,
+        });
+        res.json({ event });
     } catch (err) {
-        res.json({ success: false, error: err })
+        res.json({ err });
+    }
+});
+
+router.post("/add", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+
+        const {
+            name,
+            description,
+            lastDate,
+            host,
+            eligibility,
+            startDate,
+            endDate,
+            isIndependent,
+            website,
+            regLink,
+            links,
+            cover_image,
+            email,
+            phone,
+            tags,
+            institute,
+            fields,
+            country,
+            state,
+        } = req.body;
+
+        let event = new Event({
+            uploader: user._id,
+            upload_date: new Date(),
+            name,
+            description,
+            lastDate,
+            host,
+            eligibility,
+            startDate,
+            endDate,
+            isIndependent,
+            website,
+            regLink,
+            links,
+            cover_image,
+            email,
+            phone,
+            tags,
+            institute,
+            fields,
+            country,
+            state,
+        });
+        await event.save();
+        res.json({ done: true });
+    } catch (err) {
+        console.log(err);
+        res.json({ success: false, error: err });
+    }
+});
+
+router.get("/getForEdit/:id", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        const event = await Event.findOne({
+            _id: req.params.id,
+            uploader: user._id,
+        });
+        res.json({ event });
+    } catch (err) {
+        res.json({ success: false, error: err });
+    }
+});
+
+router.put("/edit/:id", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        await Event.updateOne(
+            { _id: req.params.id, uploader: user._id },
+            { $set: req.body }
+        );
+        res.json({ done: true });
+    } catch (err) {
+        res.json({ err });
+    }
+});
+
+router.post("/search", async (req, res) => {
+    try {
+        const events = await Event.find({
+            $text: { $search: req.body.search },
+        });
+        return res.json({ events });
+    } catch (err) {
+        return res.json({ err });
+    }
+});
+
+router.post("/field", async (req, res) => {
+    try {
+        const events = await Event.find({ fields: req.body.field });
+        return res.json({ events });
+    } catch (err) {
+        res.json({ err });
+    }
+});
+
+router.delete("/delete/:id", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        await Event.deleteOne({ _id: req.params.id, uploader: user._id });
+        res.json({ done: true });
+    } catch (err) {
+        res.json({ err });
     }
 });
 

@@ -8,34 +8,133 @@ router.get("/", async (req, res) => {
     res.json({ orgs });
 });
 
-router.get("/:id", async (req, res) => {
-    let org = await Org.findOne({ _id: req.params.id });
-    res.json({ org });
-});
-
 router.post("/add", async (req, res) => {
-    const user = await User.findOne({ access_token: req.query.access_token });
-
-    const admins = req.body.admins;
-    admins.push(user._id);
-
     try {
-        let org = new Org({
-            name: req.body.name,
-            institute: req.body.institute,
-            isIndependant: req.body.isIndependant,
-            description: req.body.description,
-            website_url: req.body.website_url,
-            links: req.body.links,
-            members: req.body.members,
-            logo_url: req.body.logo_url,
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+
+        const {
+            name,
+            institute,
+            isIndependent,
+            description,
+            website_url,
+            links,
+            members,
+            logo_url,
             admins,
+            alumni,
+        } = req.body;
+
+        admins.push(user._id.toString());
+
+        let org = new Org({
+            name,
+            institute,
+            isIndependent,
+            description,
+            website_url,
+            links,
+            members,
+            logo_url,
+            admins,
+            alumni,
         });
 
         await org.save();
         res.json({ done: true });
     } catch (err) {
         res.json({ done: false, error: err });
+    }
+});
+
+router.get("/id/:id", async (req, res) => {
+    let org = await Org.findOne({ _id: req.params.id });
+    res.json({ org });
+});
+
+router.get("/getForEdit/:id", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        const org = await Org.findOne({
+            _id: req.params.id,
+        });
+        const verified = org.admins.find(
+            (admin) => admin.toString() === user._id.toString()
+        );
+
+        if (verified) {
+            return res.json({ org });
+        } else {
+            return res.json({ err: "User mismatch" });
+        }
+    } catch (err) {
+        return res.json({ err });
+    }
+});
+
+router.post("/search", async (req, res) => {
+    try {
+        const orgs = await Org.find({
+            $text: { $search: req.body.search },
+        });
+        return res.json({ data: orgs });
+    } catch (err) {
+        return res.json({ err });
+    }
+});
+
+router.delete("/delete/:id", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        const org = await Org.findOne({
+            _id: req.params.id,
+        });
+
+        const verified = org.admins.find(
+            (admin) => admin.toString() === user._id.toString()
+        );
+
+        if (verified) {
+            await Org.deleteOne({ _id: req.params.id });
+            return res.json({ done: true });
+        } else {
+            return res.json({ err: "User mismatch" });
+        }
+    } catch (err) {
+        return res.json({ err });
+    }
+});
+
+router.put("/edit/:id", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            access_token: req.query.access_token,
+        });
+        const org = await Org.findOne({
+            _id: req.params.id,
+        });
+        const verified = org.admins.find(
+            (admin) => admin.toString() === user._id.toString()
+        );
+
+        if (verified) {
+            const adminPresent = req.body.admins.find(
+                (admin) => admin.toString() === user._id.toString()
+            );
+
+            !adminPresent && req.body.admins.push(user._id.toString());
+
+            await Org.updateOne({ _id: req.params.id }, { $set: req.body });
+            return res.json({ done: true });
+        }
+    } catch (err) {
+        res.json({ err });
     }
 });
 

@@ -1,92 +1,86 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const EventSchema = new mongoose.Schema({
-    author: {
-        type: String,
-        required: true
+const EventSchema = new mongoose.Schema(
+    {
+        uploader: {
+            type: String,
+            required: true,
+        },
+        upload_date: {
+            type: Date,
+            required: true,
+        },
+        name: {
+            type: String,
+            required: true,
+        },
+        institute: {
+            type: String,
+        },
+        isIndependent: {
+            type: Boolean,
+            required: true,
+        },
+        description: {
+            type: String,
+            required: true,
+        },
+        lastDate: {
+            type: Date,
+        },
+        host: {
+            type: String,
+            required: true,
+        },
+        eligibility: {
+            type: String,
+        },
+        startDate: {
+            type: Date,
+            required: true,
+        },
+        endDate: {
+            type: Date,
+            required: true,
+        },
+        org: {
+            type: String,
+        },
+        website: {
+            type: String,
+            required: true,
+        },
+        links: {
+            type: Object,
+        },
+        email: {
+            type: String,
+        },
+        phone: String,
+        cover_image: {
+            type: String,
+            required: true,
+        },
+        country: {
+            type: String,
+            required: true,
+        },
+        state: {
+            type: String,
+        },
+        tags: {
+            type: Array,
+            default: [],
+        },
+        regLink: {
+            type: String,
+            required: true,
+        },
+        fields: Array,
     },
-    upload_date: {
-        type: Date,
-        required: true
-    },
-    name: {
-        type: String,
-        required: true
-    },
-    organisers: {
-        type: String,
-        required: false
-    },
-    isIndependant: {
-        type: Boolean,
-        required: true
-    },
-    description: {
-        type: String,
-        required: false
-    },
-    reg_last_date: {
-        type: Date,
-        required: true
-    },
-    hosting_method: {
-        type: String,
-        required: true
-    },
-    eligibility: {
-        type: String,
-        required: true
-    },
-    event_start_date: {
-        type: Date,
-        required: true
-    },
-    event_end_date: {
-        type: Date,
-        required: true
-    },
-    event_start_time: {
-        type: Date,
-        required: true
-    },
-    event_end_time: {
-        type: Date,
-        required: true
-    },
-    org: {
-        type: String,
-        required: false
-    },
-    website: {
-        type: String,
-        required: false
-    },
-    links: {
-        type: Object,
-        required: false
-    },
-    email_address: {
-        type: Array,
-        required: true
-    },
-    banner: {
-        type: String,
-        required: true
-    },
-    country: {
-        type: String,
-        required: true
-    },
-    state: {
-        type: String,
-        required: true
-    },
-    tags: {
-        type: Array,
-        default: []
-    },
-})
+    { timestamps: true }
+);
 
-const Event = mongoose.model('Event', EventSchema);
+const Event = mongoose.model("event", EventSchema);
 
 module.exports = Event;
