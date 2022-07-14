@@ -12,4 +12,23 @@ router.get('/projects/:field', (req, res) => {
     })
 });
 
+router.post('/comment/new', async(req, res) => {
+    let user = await User.findOne({ access_token: req.query.access_token })
+    if (user) {
+        let comment = new Comment({
+            author: user._id,
+            date: Date.now(),
+            comment: req.body.comment,
+            details: {
+                type: 'project',
+                id: req.body.project_id
+            }
+        })
+        await comment.save()
+        res.json({ success: true })
+    } else {
+        res.json({ success: false, error: 'User not found.' })
+    }
+})
+
 module.exports = router

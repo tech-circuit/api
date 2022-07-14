@@ -117,7 +117,7 @@ router.get("/id/:id", async(req, res) => {
         });
         res.json({ user });
     } else {
-        res.json({ success: true, error: "User not found." })
+        res.json({ success: false, error: "User not found." })
     }
 });
 
