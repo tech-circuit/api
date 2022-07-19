@@ -9,6 +9,20 @@ router.get("/", async (req, res) => {
     res.json({ projects });
 });
 
+router.get("/:user", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            _id: req.params.user,
+        });
+        const projects = await Project.find({ uploader: user._id }).sort({
+            createdAt: -1,
+        });
+        return res.json({ projects });
+    } catch (err) {
+        return res.json(err);
+    }
+});
+
 router.post("/add", async (req, res) => {
     const user = await User.findOne({ access_token: req.query.access_token });
     const {
