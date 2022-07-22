@@ -10,6 +10,26 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    verify_token: {
+        type: String,
+        required: false
+    },
+    pending_credentials: {
+        type: {
+            password: String,
+            username: String,
+            verified: Boolean
+        },
+        required: false
+    },
+    password: {
+        type: String,
+        required: false
+    },
+    verified: {
+        type: Boolean,
+        required: true
+    },
     pfp_url: {
         type: String,
     },
