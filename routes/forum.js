@@ -395,4 +395,13 @@ router.get('/delete/:post_id', async (req, res) => {
     }
 })
 
+router.get("/profile/:id", async (req, res) => {
+    try {
+        const posts = await Post.find({ author: req.params.id })
+        res.json({posts})
+    } catch(err) {
+        res.json(err)
+    }
+})
+
 module.exports = router
