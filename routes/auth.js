@@ -3,6 +3,16 @@ const bcrypt = require("bcrypt");
 const router = express.Router();
 const randomstring = require("randomstring");
 const axios = require("axios");
+const nodemailer = require('nodemailer');
+
+// Mail Config
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'techcircuitcontact@gmail.com',
+        pass: `${process.env.EMAIL_PASSWORD}`
+    }
+});
 
 router.post('/signup', async(req, res) => {
     try {
@@ -20,12 +30,30 @@ router.post('/signup', async(req, res) => {
             user.access_token = randomstring.generate({
                 length: 35
             })
-            user.verify_token = randomstring.generate({
+            let verification_token = randomstring.generate({
                 length: 20
             })
+            user.verify_token = verification_token
             await user.save()
-                // await call node mailer function that takes email, name and verify_email as parameters
-            res.json({ success: true, message: 'Verify your email address.' })
+            var mailOptions = {
+                from: 'techcircuitcontact@gmail.com',
+                to: `${req.body.email}`,
+                subject: 'Verification Email',
+                html: `<p>
+                Hey ${req.body.firstname}, <br>
+                Please verify your email address by clicking the link below: <br>
+                <a href="https://api.techcircuit.co/user/verify/${verification_token}">Verify Email</a>
+            </p>`
+            };
+
+            transporter.sendMail(mailOptions, function(error, info) {
+                if (error) {
+                    res.json({ success: false, error: error })
+                } else {
+                    console.log('Email sent: ' + info.response);
+                    res.json({ success: true, message: 'Verify your email address.' })
+                }
+            })
         } else {
             if (!checkUser.pending_credentials.verified) {
                 const salt = await bcrypt.genSalt(10)
