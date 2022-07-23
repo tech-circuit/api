@@ -14,11 +14,6 @@ let transporter = nodemailer.createTransport({
     }
 });
 
-router.get('/hh', async(req, res) => {
-    let username = "Anshul"
-    let token = "adasfkangak"
-})
-
 router.post('/signup', async(req, res) => {
     try {
         const checkUser = await User.findOne({ email: req.body.email });
