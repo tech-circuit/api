@@ -23,7 +23,7 @@ router.post('/signup', async(req, res) => {
             user.verify_token = randomstring.generate({
                 length: 20
             })
-            user.save()
+            await user.save()
                 // await call node mailer function that takes email, name and verify_email as parameters
             res.json({ success: true, message: 'Verify your email address.' })
         } else {
@@ -35,6 +35,7 @@ router.post('/signup', async(req, res) => {
                     verified: false,
                     password: password
                 }
+                await checkUser.save()
                 res.json({ success: true, message: 'Verify your email address.' })
             } else {
                 res.json({ success: false, error: 'Verify your email address.' })

@@ -251,14 +251,15 @@ router.get("/all", async(req, res) => {
     }
 });
 
-router.get('/verify/:verifyToken', (req, res) => {
+router.get('/verify/:verifyToken', async(req, res) => {
     try {
         const user = User.findOne({ verify_token: req.params.verifyToken })
         if (user) {
             user.verified = true
             user.password = user.pending_credentials.password
             user.username = user.pending_credentials.username
-            delete user.pending_credentials
+            delete user.pending_credentials;
+            await user.save()
         } else {
             res.status(400).json({ success: false, error: 'Invalid verify token' })
         }
