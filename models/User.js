@@ -28,7 +28,8 @@ const UserSchema = new mongoose.Schema({
     },
     verified: {
         type: Boolean,
-        required: true
+        required: true,
+        default: false
     },
     pfp_url: {
         type: String,
