@@ -9,8 +9,8 @@ const nodemailer = require('nodemailer');
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'techcircuitcontact@gmail.com',
-      pass: `${process.env.EMAIL_PASSWORD}`
+        user: 'techcircuitcontact@gmail.com',
+        pass: `${process.env.EMAIL_PASSWORD}`
     }
 });
 
@@ -34,7 +34,7 @@ router.post('/signup', async(req, res) => {
                 length: 20
             })
             user.verify_token = verification_token
-            user.save()
+            await user.save()
             var mailOptions = {
                 from: 'techcircuitcontact@gmail.com',
                 to: `${req.body.email}`,
@@ -45,8 +45,8 @@ router.post('/signup', async(req, res) => {
                 <a href="https://api.techcircuit.co/user/verify/${verification_token}">Verify Email</a>
             </p>`
             };
-        
-            transporter.sendMail(mailOptions, function(error, info){
+
+            transporter.sendMail(mailOptions, function(error, info) {
                 if (error) {
                     res.json({ success: false, error: error })
                 } else {
@@ -63,6 +63,7 @@ router.post('/signup', async(req, res) => {
                     verified: false,
                     password: password
                 }
+                await checkUser.save()
                 res.json({ success: true, message: 'Verify your email address.' })
             } else {
                 res.json({ success: false, error: 'Verify your email address.' })
