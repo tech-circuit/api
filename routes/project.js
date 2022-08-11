@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/fields", (_, res) => {
-    res.json(fields);
+    res.json({ success: true, fields });
 });
 
 router.get("user/:user", async (req, res) => {
