@@ -260,6 +260,7 @@ router.get('/verify/:verifyToken', async(req, res) => {
             user.username = user.pending_credentials.username
             delete user.pending_credentials;
             await user.save()
+            res.redirect('https://techcircuitfront.netlify.app/login?verified=true')
         } else {
             res.status(400).json({ success: false, error: 'Invalid verify token' })
         }
