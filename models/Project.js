@@ -6,8 +6,8 @@ const ProjectSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        cover_image: {
-            type: String,
+        imgs: {
+            type: Array,
             required: false,
         },
         collaborators: {

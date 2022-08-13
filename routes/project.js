@@ -37,7 +37,7 @@ router.post("/add", async (req, res) => {
     const user = await User.findOne({ access_token: req.query.access_token });
     const {
         title,
-        cover_image,
+        imgs,
         description,
         fields,
         links,
@@ -49,7 +49,7 @@ router.post("/add", async (req, res) => {
     try {
         let project = new Project({
             title,
-            cover_image,
+            imgs,
             description,
             fields,
             links,
