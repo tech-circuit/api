@@ -253,19 +253,16 @@ router.get("/all", async(req, res) => {
 
 router.get('/verify/:verifyToken', async(req, res) => {
     try {
-        const user = User.findOne({ verify_token: req.params.verifyToken })
+        const user = await User.findOne({ verify_token: req.params.verifyToken })
         if (user) {
             user.verified = true
-            user.password = user.pending_credentials.password
-            user.username = user.pending_credentials.username
-            delete user.pending_credentials;
             await user.save()
             res.redirect('https://techcircuitfront.netlify.app/login?verified=true')
         } else {
             res.status(400).json({ success: false, error: 'Invalid verify token' })
         }
     } catch (err) {
-        res.status(400).json({ success: false })
+        res.status(400).json({ success: false, error: err.toString() })
     }
 })
 

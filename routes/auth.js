@@ -5,6 +5,8 @@ const randomstring = require("randomstring");
 const axios = require("axios");
 const nodemailer = require('nodemailer');
 
+const User = require("../models/User");
+
 // Mail Config
 let transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -55,14 +57,10 @@ router.post('/signup', async(req, res) => {
                 }
             })
         } else {
-            if (!checkUser.pending_credentials.verified) {
+            if (!checkUser.verified) {
                 const salt = await bcrypt.genSalt(10)
                 const password = await bcrypt.hash(req.body.password, salt)
-                checkUser.pending_credentials = {
-                    username: req.body.username,
-                    verified: false,
-                    password: password
-                }
+                checkUser.password = password;
                 await checkUser.save()
                 res.json({ success: true, message: 'Verify your email address.' })
             } else {
@@ -75,15 +73,18 @@ router.post('/signup', async(req, res) => {
 })
 
 router.post('/login', async(req, res) => {
-    const user = null
-    if ('@' in req.body.username) {
-        user = await User.findOne({ email: req.body.email, verified: true })
+    let user = null
+    if (req.body.email.includes('@')) {
+        user = await User.findOne({ email: req.body.email })
     } else {
-        user = await User.findOne({ username: req.body.username, verified: true })
+        user = await User.findOne({ username: req.body.email })
     }
     if (user) {
         const validPassword = await bcrypt.compare(req.body.password, user.password);
         if (validPassword) {
+            if (!user.verified) {
+                return res.status(400).json({ success: false, error: "Verify your email address." })
+            }
             res.status(200).json({ success: true, user: user, message: "Valid password" });
         } else {
             res.status(400).json({ success: false, error: "Invalid Password" });
