@@ -38,6 +38,7 @@ router.post("/add", async (req, res) => {
     const {
         title,
         imgs,
+        cover,
         description,
         fields,
         links,
@@ -50,6 +51,7 @@ router.post("/add", async (req, res) => {
         let project = new Project({
             title,
             imgs,
+            cover,
             description,
             fields,
             links,

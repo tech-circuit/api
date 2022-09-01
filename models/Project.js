@@ -6,6 +6,7 @@ const ProjectSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        cover: { type: String, required: true },
         imgs: {
             type: Array,
             required: false,
