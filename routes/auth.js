@@ -57,6 +57,9 @@ router.post('/signup', async(req, res) => {
                 }
             })
         } else {
+            if (checkUser.google_id) {
+              return res.json({ success: false, error: 'Please login with Google' })
+            }
             if (!checkUser.verified) {
                 const salt = await bcrypt.genSalt(10)
                 const password = await bcrypt.hash(req.body.password, salt)
