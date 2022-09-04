@@ -83,6 +83,9 @@ router.post('/login', async(req, res) => {
         user = await User.findOne({ username: req.body.email })
     }
     if (user) {
+        if (user.google_id) {
+          return res.json({ success: false, error: 'Please login with Google' })
+        }
         const validPassword = await bcrypt.compare(req.body.password, user.password);
         if (validPassword) {
             if (!user.verified) {
