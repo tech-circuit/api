@@ -41,7 +41,7 @@ function createNotification(sender, type, typeDetails) {
             if (typeDetails.type === "project") {
                 let project = await Project.findOne({ _id: typeDetails.typeID })
                 notif.meta.description = `${user.given_name} has commented on your project '${truncateText(project.title)}'`
-                notif.meta.img = project.cover_image
+                notif.meta.img = project.cover
                 receivers = [project.uploader]
             } else if (typeDetails.type === "post") {
                 let post = await Post.findOne({ _id: typeDetails.typeID })
