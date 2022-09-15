@@ -15,7 +15,7 @@ function truncateText(text) {
 
 function createNotification(sender, type, typeDetails) {
     // createNotification function details:
-    // if type == request, typeDetails is {type: "orgJoin", typeID: orgID}, or {type: "eventOrgHost", typeID: orgID, eventID: eventID}
+    // if type == request, typeDetails is {type: "orgJoin", typeID: orgID, typeReceiver (prop only if admin invite): userID of receiver }, or {type: "eventOrgHost", typeID: orgID, eventID: eventID}
     // if type == comment, typeDetails is either {type: "project", typeID: projectID}, or {type: "post", typeID: postID}
     let promise = new Promise(async(resolve, reject) => {
         let notifs = []
@@ -30,13 +30,21 @@ function createNotification(sender, type, typeDetails) {
         if (type === "request") {
             let org = await Org.findOne({ _id: typeDetails.typeID });
             if (typeDetails.type === "orgJoin") {
-                notif.meta.description = `${user.given_name} has requested to join '${truncateText(org.name)}' club`
+                if (org.admins.includes(sender.toString())) {
+                    notif.meta.description = `${user.given_name} has invited you to join '${truncateText(org.name)}' club`
+                } else {
+                    notif.meta.description = `${user.given_name} has requested to join '${truncateText(org.name)}' club`
+                }
             } else if (typeDetails.type === "eventOrgHost") {
                 let event = await Event.findOne({ _id: typeDetails.eventID })
                 notif.meta.description = `${user.given_name} is requesting '${truncateText(org.name)}' to host '${truncateText(event.name)}' event`
             }
             notif.meta.img = user.pfp_url
-            receivers = org.admins
+            if (org.admins.includes(sender.toString())) {
+                receivers = [typeDetails.typeReceiver]
+            } else {
+                receivers = org.admins
+            }
         } else if (type === "comment") {
             if (typeDetails.type === "project") {
                 let project = await Project.findOne({ _id: typeDetails.typeID })

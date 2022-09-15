@@ -46,6 +46,7 @@ const OrgSchema = new mongoose.Schema(
             required: false,
         },
         requests: Array,
+        invites: Array,
     },
     { timestamps: true }
 );

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const Org = require("../models/Org");
+const createNotification = require("../helpers/createNotification");
 
 router.get("/", async (req, res) => {
     let orgs = await Org.find().sort({ createdAt: -1 });
@@ -158,9 +159,47 @@ router.post("/req/:id", async (req, res) => {
                 }
             );
 
-            res.json({ done: true });
+            const { status, receivers } = await createNotification(user._id, 'request', {type: "orgJoin", typeID: org._id});
+            if (status) {
+                res.json({ done: true, receivers: receivers })
+            } else {
+                res.json({ done: false, error: 'Could not create notification.' })
+            }
         } catch (err) {
             res.json({ done: false, error: err });
+        }
+    }
+});
+
+router.post("/invite/:id", async (req, res) => {
+    const user = await User.findOne({ access_token: req.query.access_token });
+
+    const org = await Org.findById(req.params.id);
+    let invites = org.requests;
+
+    if (org.admins.includes(user._id.toString())) {
+        if (invites.includes(req.body.invite)) {
+            res.json({ already: true });
+        } else {
+            invites.push(req.body.invite);
+            try {
+                await Org.updateOne(
+                    { _id: req.params.id },
+                    {
+                        $set: {
+                            invites: invites,
+                        },
+                    }
+                );
+                const { status, receivers } = await createNotification(user._id, 'request', {type: "orgJoin", typeID: org._id, typeReceiver: req.body.invite});
+                if (status) {
+                    res.json({ done: true, receivers: receivers })
+                } else {
+                    res.json({ done: false, error: 'Could not create notification.' })
+                }
+            } catch (err) {
+                res.json({ done: false, error: err });
+            }
         }
     }
 });
