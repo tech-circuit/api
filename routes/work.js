@@ -48,7 +48,6 @@ router.get("/comments/:id", async (req, res) => {
         rowsPerPage: limit,
     };
     let user = await User.findOne({ access_token: req.query.access_token });
-    console.log("COMMENTS PROJECT", req.params.id);
     // let project = await Project.findOne({ _id: req.params.id });
     let comments = await Comment.find({
         details: { type: "project", id: req.params.id },

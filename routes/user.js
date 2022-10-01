@@ -2,15 +2,17 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const User = require("../models/User");
+const Org = require("../models/Org");
+const Project = require("../models/Project");
 const Comment = require("../models/Comment");
 const MailList = require("../models/MailingListEmail");
 const Post = require("../models/Post");
 
 const DISCORD_CLIENT_ID = "830041863247495168";
 
-router.post("/gauth", async(req, res) => {
+router.post("/gauth", async (req, res) => {
     try {
-        User.findOne({ google_id: req.body.googleId }).then(async(user) => {
+        User.findOne({ google_id: req.body.googleId }).then(async (user) => {
             if (!user) {
                 let username = req.body.email.split("@")[0];
                 req.body.imageUrl = req.body.imageUrl.slice(0, -4);
@@ -25,7 +27,7 @@ router.post("/gauth", async(req, res) => {
                     access_token: req.body.access_token,
                     username: username,
                     setUp: false,
-                    verified: true
+                    verified: true,
                 });
                 await newUser.save();
                 return res.json({ user: newUser });
@@ -49,14 +51,15 @@ router.get("/discordauth", (req, res) => {
     );
 });
 
-router.get("/discordauth/callback", async(req, res) => {
+router.get("/discordauth/callback", async (req, res) => {
     try {
         const code = req.query.code;
         const access_token = req.query.state;
         let response = await axios
             .post(
                 "https://discord.com/api/oauth2/token",
-                `client_id=${DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&grant_type=authorization_code&code=${code}&redirect_uri=${process.env.BASE_URL}/user/discordauth/callback&scopes=identify`, {
+                `client_id=${DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&grant_type=authorization_code&code=${code}&redirect_uri=${process.env.BASE_URL}/user/discordauth/callback&scopes=identify`,
+                {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
@@ -65,11 +68,12 @@ router.get("/discordauth/callback", async(req, res) => {
             .catch((err) => {
                 console.log(err);
             });
-        User.findOne({ access_token: access_token }).then(async(user) => {
+        User.findOne({ access_token: access_token }).then(async (user) => {
             if (user) {
                 user.discord_auth = response.data;
                 let discord_user = await axios.get(
-                    "https://discord.com/api/users/@me", {
+                    "https://discord.com/api/users/@me",
+                    {
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded",
                             Authorization: `Bearer ${response.data.access_token}`,
@@ -92,7 +96,7 @@ router.get("/discordauth/callback", async(req, res) => {
     }
 });
 
-router.get("/pfp", async(req, res) => {
+router.get("/pfp", async (req, res) => {
     try {
         let user = await User.findOne({ access_token: req.query.access_token });
         if (user) {
@@ -102,17 +106,20 @@ router.get("/pfp", async(req, res) => {
         }
     } catch (err) {
         console.log(err);
-        res.json({ success: false, error: 'User not found.' });
+        res.json({ success: false, error: "User not found." });
     }
 });
 
-router.put("/pfp", async(req, res) => {
+router.put("/pfp", async (req, res) => {
     try {
-        await User.updateOne({ access_token: req.query.access_token }, {
-            $set: {
-                pfp_url: req.body.pfp,
-            },
-        });
+        await User.updateOne(
+            { access_token: req.query.access_token },
+            {
+                $set: {
+                    pfp_url: req.body.pfp,
+                },
+            }
+        );
         const user = await User.findOne({
             access_token: req.query.access_token,
         });
@@ -123,13 +130,16 @@ router.put("/pfp", async(req, res) => {
     }
 });
 
-router.delete("/pfp", async(req, res) => {
+router.delete("/pfp", async (req, res) => {
     try {
-        await User.updateOne({ access_token: req.query.access_token }, {
-            $set: {
-                pfp_url: "/assets/userFlowIcon.svg",
-            },
-        });
+        await User.updateOne(
+            { access_token: req.query.access_token },
+            {
+                $set: {
+                    pfp_url: "/assets/userFlowIcon.svg",
+                },
+            }
+        );
         const user = await User.findOne({
             access_token: req.query.access_token,
         });
@@ -139,7 +149,7 @@ router.delete("/pfp", async(req, res) => {
     }
 });
 
-router.get("/id/:id", async(req, res) => {
+router.get("/id/:id", async (req, res) => {
     try {
         let user = await User.findById(req.params.id).select({
             username: 1,
@@ -158,11 +168,11 @@ router.get("/id/:id", async(req, res) => {
         res.json({ success: true, user: user });
     } catch (err) {
         console.log(err);
-        res.json({ success: false, error: 'User not found.' });
+        res.json({ success: false, error: "User not found." });
     }
 });
 
-router.get("/info", async(req, res) => {
+router.get("/info", async (req, res) => {
     try {
         const user = await User.findOne({
             access_token: req.query.access_token,
@@ -181,25 +191,45 @@ router.get("/info", async(req, res) => {
             skills: 1,
             setUp: 1,
         });
-        res.json({ success: true, user: user });
+        let orgs = [];
+        if (req.query.org == "true") {
+            const admins = await Org.find({ admins: user._id.toString() });
+            const members = await Org.find({ members: user._id.toString() });
+            const alumni = await Org.find({ alumni: user._id.toString() });
+
+            orgs = orgs.concat(admins, members, alumni);
+        }
+        let projects = [];
+        if (req.query.projects == "true") {
+            const projs = await Project.find({
+                uploader: user._id.toString(),
+            });
+
+            projects = projects.concat(projs);
+        }
+
+        res.json({ success: true, user, orgs, projects });
     } catch (err) {
         console.log(err);
-        res.json({ success: false, error: 'User not found.' });
+        res.json({ success: false, error: "User not found." });
     }
 });
 
-router.post("/update", async(req, res) => {
+router.post("/update", async (req, res) => {
     try {
-        await User.updateOne({ access_token: req.query.access_token }, {
-            $set: req.body,
-        });
+        await User.updateOne(
+            { access_token: req.query.access_token },
+            {
+                $set: req.body,
+            }
+        );
         res.json({ success: true });
     } catch (err) {
         res.json({ error: err, success: false });
     }
 });
 
-router.post("/search", async(req, res) => {
+router.post("/search", async (req, res) => {
     try {
         const users = await User.find({
             $text: { $search: req.body.search },
@@ -211,7 +241,7 @@ router.post("/search", async(req, res) => {
     }
 });
 
-router.delete("/delete", async(req, res) => {
+router.delete("/delete", async (req, res) => {
     try {
         const user = await User.findOne({
             access_token: req.query.access_token,
@@ -232,8 +262,7 @@ router.delete("/delete", async(req, res) => {
     }
 });
 
-
-router.get("/all", async(req, res) => {
+router.get("/all", async (req, res) => {
     try {
         let users = await User.find()
             .select({
@@ -251,19 +280,26 @@ router.get("/all", async(req, res) => {
     }
 });
 
-router.get('/verify/:verifyToken', async(req, res) => {
+router.get("/verify/:verifyToken", async (req, res) => {
     try {
-        const user = await User.findOne({ verify_token: req.params.verifyToken })
+        const user = await User.findOne({
+            verify_token: req.params.verifyToken,
+        });
         if (user) {
-            user.verified = true
-            await user.save()
-            res.redirect('https://techcircuitfront.netlify.app/login?verified=true')
+            user.verified = true;
+            await user.save();
+            res.redirect(
+                "https://techcircuitfront.netlify.app/login?verified=true"
+            );
         } else {
-            res.status(400).json({ success: false, error: 'Invalid verify token' })
+            res.status(400).json({
+                success: false,
+                error: "Invalid verify token",
+            });
         }
     } catch (err) {
-        res.status(400).json({ success: false, error: err.toString() })
+        res.status(400).json({ success: false, error: err.toString() });
     }
-})
+});
 
 module.exports = router;

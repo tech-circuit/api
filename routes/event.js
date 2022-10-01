@@ -128,6 +128,22 @@ router.post("/field", async (req, res) => {
     }
 });
 
+router.get("/user/:user", async (req, res) => {
+    try {
+        const user = await User.findOne({
+            _id: req.params.user,
+        });
+        const events = await Event.find({
+            uploader: user._id.toString(),
+        }).sort({
+            createdAt: -1,
+        });
+        res.json({ events });
+    } catch (err) {
+        res.json({ success: false, error: err });
+    }
+});
+
 router.delete("/delete/:id", async (req, res) => {
     try {
         const user = await User.findOne({

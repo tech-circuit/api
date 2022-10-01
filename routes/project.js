@@ -18,17 +18,18 @@ router.get("/fields", (_, res) => {
     res.json({ success: true, fields });
 });
 
-router.get("user/:user", async (req, res) => {
+router.get("/user/:user", async (req, res) => {
     try {
         const user = await User.findOne({
             _id: req.params.user,
         });
-        const projects = await Project.find({ uploader: user._id }).sort({
+        const projects = await Project.find({
+            uploader: user._id.toString(),
+        }).sort({
             createdAt: -1,
         });
         res.json({ projects });
     } catch (err) {
-        console.log(err);
         res.json({ success: false, error: err });
     }
 });
@@ -126,6 +127,7 @@ router.post("/search", async (req, res) => {
         const field = req.body.field;
 
         if (field) {
+            console.log("field");
             const projects = await Project.find({
                 fields: req.body.field,
                 $text: { $search: req.body.search },
@@ -137,6 +139,8 @@ router.post("/search", async (req, res) => {
         const projects = await Project.find({
             $text: { $search: req.body.search },
         });
+        console.log(projects);
+
         return res.json({ success: true, projects: projects });
     } catch (err) {
         return res.json({ success: false, error: err });
