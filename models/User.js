@@ -58,10 +58,6 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    orgs: {
-        type: Array,
-        required: false
-    },
     title: {
         type: String,
         required: false

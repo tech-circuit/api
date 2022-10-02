@@ -159,15 +159,26 @@ router.get("/id/:id", async (req, res) => {
             links: 1,
             email: 1,
             about: 1,
-            org: 1,
             country: 1,
             city: 1,
             skills: 1,
             _id: 1,
         });
-        res.json({ success: true, user: user });
+
+        let orgs = [];
+        const admins = await Org.find({ admins: user._id.toString() });
+        const members = await Org.find({ members: user._id.toString() });
+        const alumni = await Org.find({ alumni: user._id.toString() });
+        orgs = orgs.concat(admins, members, alumni);
+
+        let projects = [];
+        const projs = await Project.find({
+            uploader: user._id.toString(),
+        });
+        projects = projects.concat(projs);
+
+        res.json({ success: true, user, orgs, projects });
     } catch (err) {
-        console.log(err);
         res.json({ success: false, error: "User not found." });
     }
 });
@@ -210,7 +221,6 @@ router.get("/info", async (req, res) => {
 
         res.json({ success: true, user, orgs, projects });
     } catch (err) {
-        console.log(err);
         res.json({ success: false, error: "User not found." });
     }
 });
