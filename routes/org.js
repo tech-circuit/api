@@ -204,4 +204,11 @@ router.post("/invite/:id", async (req, res) => {
     }
 });
 
+router.post("/get-requests", async (req, res) => {
+    const body = req.body
+    const users = await User.find({ _id: body.requests });
+
+    res.json({ users });
+})
+
 module.exports = router;
