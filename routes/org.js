@@ -135,6 +135,7 @@ router.put("/edit/:id", async (req, res) => {
             return res.json({ done: true });
         }
     } catch (err) {
+        console.log(err);
         res.json({ err });
     }
 });
@@ -159,11 +160,18 @@ router.post("/req/:id", async (req, res) => {
                 }
             );
 
-            const { status, receivers } = await createNotification(user._id, 'request', {type: "orgJoin", typeID: org._id});
+            const { status, receivers } = await createNotification(
+                user._id,
+                "request",
+                { type: "orgJoin", typeID: org._id }
+            );
             if (status) {
-                res.json({ done: true, receivers: receivers })
+                res.json({ done: true, receivers: receivers });
             } else {
-                res.json({ done: false, error: 'Could not create notification.' })
+                res.json({
+                    done: false,
+                    error: "Could not create notification.",
+                });
             }
         } catch (err) {
             res.json({ done: false, error: err });
@@ -191,11 +199,22 @@ router.post("/invite/:id", async (req, res) => {
                         },
                     }
                 );
-                const { status, receivers } = await createNotification(user._id, 'request', {type: "orgJoin", typeID: org._id, typeReceiver: req.body.invite});
+                const { status, receivers } = await createNotification(
+                    user._id,
+                    "request",
+                    {
+                        type: "orgJoin",
+                        typeID: org._id,
+                        typeReceiver: req.body.invite,
+                    }
+                );
                 if (status) {
-                    res.json({ done: true, receivers: receivers })
+                    res.json({ done: true, receivers: receivers });
                 } else {
-                    res.json({ done: false, error: 'Could not create notification.' })
+                    res.json({
+                        done: false,
+                        error: "Could not create notification.",
+                    });
                 }
             } catch (err) {
                 res.json({ done: false, error: err });
@@ -205,10 +224,10 @@ router.post("/invite/:id", async (req, res) => {
 });
 
 router.post("/get-requests", async (req, res) => {
-    const body = req.body
+    const body = req.body;
     const users = await User.find({ _id: body.requests });
 
     res.json({ users });
-})
+});
 
 module.exports = router;
