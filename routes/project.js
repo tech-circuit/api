@@ -127,7 +127,6 @@ router.post("/search", async (req, res) => {
         const field = req.body.field;
 
         if (field) {
-            console.log("field");
             const projects = await Project.find({
                 fields: req.body.field,
                 $text: { $search: req.body.search },
@@ -139,9 +138,8 @@ router.post("/search", async (req, res) => {
         const projects = await Project.find({
             $text: { $search: req.body.search },
         });
-        console.log(projects);
 
-        return res.json({ success: true, projects: projects });
+        return res.json({ success: true, projects });
     } catch (err) {
         return res.json({ success: false, error: err });
     }
