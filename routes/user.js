@@ -233,7 +233,7 @@ router.post("/update", async (req, res) => {
                 $set: req.body,
             }
         );
-        res.json({ success: true });
+        res.json({ success: true, done: true });
     } catch (err) {
         res.json({ error: err, success: false });
     }
