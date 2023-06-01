@@ -6,7 +6,7 @@ const fields = require("../data/fields");
 
 router.get("/", async (req, res) => {
     try {
-        const projects = await Project.find().sort({ createdAt: -1 });
+        const projects = await Project.find().limit(69).sort({ createdAt: -1 });
         res.json({ success: true, projects: projects });
     } catch (err) {
         console.log(err);
@@ -43,6 +43,7 @@ router.post("/add", async (req, res) => {
         description,
         fields,
         links,
+        mainlink,
         tags,
         event,
         collaborators,
@@ -53,6 +54,7 @@ router.post("/add", async (req, res) => {
             title,
             imgs,
             cover,
+            mainlink,
             description,
             fields,
             links,

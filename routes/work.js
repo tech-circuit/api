@@ -18,65 +18,77 @@ router.get("/projects/:field", (req, res) => {
 });
 
 router.get("/comments/:id", async (req, res) => {
-    const pageNumber = parseInt(req.query.page) || 0;
-    const limit = parseInt(req.query.limit) || 5;
-    const totalComments = await Comment.countDocuments({
-        details: { type: "project", id: req.params.id },
-    });
-    let startIndex = pageNumber * limit;
-    const endIndex = (pageNumber + 1) * limit;
-    console.log(startIndex, endIndex);
-    let skipIndex = (req.query.page - 1) * 20;
-    let response = {
-        success: true,
-        comments: [],
-        totalComments,
-        previous:
-            startIndex > 0
-                ? {
-                      pageNumber: pageNumber - 1,
-                      limit: limit,
-                  }
-                : null,
-        next:
-            endIndex < totalComments
-                ? {
-                      pageNumber: pageNumber + 1,
-                      limit: limit,
-                  }
-                : null,
-        rowsPerPage: limit,
-    };
-    let user = await User.findOne({ access_token: req.query.access_token });
-    // let project = await Project.findOne({ _id: req.params.id });
-    let comments = await Comment.find({
-        details: { type: "project", id: req.params.id },
-    })
-        .sort({ date: -1 })
-        .skip(startIndex)
-        .limit(limit);
-    let responseComments = [];
-    for (let i = 0; i < comments.length; i++) {
-        let commentAuthor = await User.findOne({ _id: comments[i].author });
-        let commentIsMine = false;
-        if (user) {
-            commentIsMine =
-                comments[i].author.toString().trim() ===
-                user._id.toString().trim()
-                    ? true
-                    : false;
-        }
-        responseComments.push({
-            comment: comments[i].comment,
-            author_username: commentAuthor.username,
-            author_pfp_url: commentAuthor.pfp_url,
-            date: comments[i].date,
-            id: comments[i]._id,
-            is_mine: commentIsMine,
+    try {
+        const pageNumber = parseInt(req.query.page) || 0;
+        const limit = parseInt(req.query.limit) || 5;
+        const totalComments = await Comment.countDocuments({
+            details: { type: "project", id: req.params.id },
         });
+        let startIndex = pageNumber * limit;
+        const endIndex = (pageNumber + 1) * limit;
+        console.log(startIndex, endIndex);
+        let skipIndex = (req.query.page - 1) * 20;
+        let response = {
+            success: true,
+            comments: [],
+            totalComments,
+            previous:
+                startIndex > 0
+                    ? {
+                          pageNumber: pageNumber - 1,
+                          limit: limit,
+                      }
+                    : null,
+            next:
+                endIndex < totalComments
+                    ? {
+                          pageNumber: pageNumber + 1,
+                          limit: limit,
+                      }
+                    : null,
+            rowsPerPage: limit,
+        };
+        let user = await User.findOne({ access_token: req.query.access_token });
+        // let project = await Project.findOne({ _id: req.params.id });
+        let comments = await Comment.find({
+            details: { type: "project", id: req.params.id },
+        })
+            .sort({ date: -1 })
+            .skip(startIndex)
+            .limit(limit);
+        let responseComments = [];
+
+        console.log(comments);
+
+        if (comments.length !== 0) {
+            for (let i = 0; i < comments.length; i++) {
+                let commentAuthor = await User.findOne({
+                    _id: comments[i].author,
+                });
+                let commentIsMine = false;
+                if (user) {
+                    commentIsMine =
+                        comments[i].author.toString().trim() ===
+                        user._id.toString().trim()
+                            ? true
+                            : false;
+                }
+                responseComments.push({
+                    comment: comments[i].comment,
+                    author_username: commentAuthor.username,
+                    author_pfp_url: commentAuthor.pfp_url,
+                    date: comments[i].date,
+                    id: comments[i]._id,
+                    is_mine: commentIsMine,
+                });
+            }
+        }
+        response.comments = responseComments;
+
+        res.json(response);
+    } catch (err) {
+        res.json({ err });
     }
-    response.comments = responseComments;
-    res.json(response);
 });
 
 router.post("/comment/new", async (req, res) => {
